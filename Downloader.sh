@@ -18,6 +18,21 @@ MAX=16                                            #
 THREADS=16                                        #
 SEG=1M                                            #
 ###################################################
+
+#                   __         _______________  ________
+#    _________.__._/  |_  ____ \_____  \   _  \ \_____  \
+#   /  ___<   |  |\   __\/  _ \ /  ____/  /_\  \  _(__  <
+#   \___ \ \___  | |  | (  <_> )       \  \_/   \/       \
+#  /____  >/ ____| |__|  \____/\_______ \_____  /______  /
+#       \/ \/                          \/     \/       \/
+#             ________                      .__                    .___
+#             \______ \   ______  _  ______ |  |   _________     __| _/___________
+#              |    |  \ /  _ \ \/ \/ /    \|  |  /  _ \__  \   / __ |/ __ \_  __ \
+#              |    `   (  <_> )     /   |  \  |_(  <_> ) __ \_/ /_/ \  ___/|  | \/
+#             /_______  /\____/ \/\_/|___|  /____/\____(____  /\____ |\___  >__|
+#                     \/                  \/                \/      \/    \/
+
+
 printf "Welcome\n"
 #CHOICE2=$1
 printf "Make Your Choice\n"
@@ -149,6 +164,20 @@ case $CHOICE in
 #read ok
                                 ;;
                         m|M)            # Mac OS
+
+
+
+
+echo "  __  __                 ____   _____ ";
+echo " |  \/  |               / __ \ / ____|";
+echo " | \  / | __ _  ___    | |  | | (___  ";
+echo " | |\/| |/ _\` |/ __|   | |  | |\___ \ ";
+echo " | |  | | (_| | (__    | |__| |____) |";
+echo " |_|  |_|\__,_|\___|    \____/|_____/ ";
+echo "                                      ";
+echo "                                      ";
+
+
                                 SET2_ARIA2C=/usr/local/bin/aria2c                 # Default for MacOS via homebrew
                                 printf "aria2c was found at "$SET2_ARIA2C"\n"
                                 [ -x $SET2_ARIA2C ] && echo "aria2c has correct permissions" || echo "aria2c wasn't found or doesnt have correct permissions"
@@ -309,6 +338,18 @@ read -n1 INPUT
     elif [ -e "$CHECK2" ]                   #check if the temp file exists
         then                                #in order to use the correct DIR and LOG
 #echo "Check 2"
+
+
+echo "  __  __                 ____   _____ ";
+echo " |  \/  |               / __ \ / ____|";
+echo " | \  / | __ _  ___    | |  | | (___  ";
+echo " | |\/| |/ _\` |/ __|   | |  | |\___ \ ";
+echo " | |  | | (_| | (__    | |__| |____) |";
+echo " |_|  |_|\__,_|\___|    \____/|_____/ ";
+echo "                                      ";
+echo "                                      ";
+
+
 #
             echo "The Following will now Run."
             echo "--****------****----****------****----****------****----****------****----****------****--"
