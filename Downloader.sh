@@ -127,35 +127,76 @@ case $CHOICE in
                                 echo "Setting Work Directories"
                                 echo "Setting Download Directory"
                                 DIR=/mnt/sda1/usb/video
-## Prompt to changer Download Directory
+                                ## Prompt to changer Download Directory
+                                printf "Keep Download path as Default? (Y/N)?\n"
+                                printf "Default: $DIR\n"
+                                    read -n 1 C_DIR
+                                        case $C_DIR in
+                                            n|N)
+                                                echo ""
+                                                read -p 'Enter Download Path:   ' DIR                # custome directory and check
+                                                    if [ -d $DIR ] && [ -w $DIR ]
+                                                    then
+                                                    printf "Directory was Found and Writable\n"
+                                                    else
+                                                    printf "Directory WAS NOT Found or WAS NOT Writable.\nExiting...\n"
+                                                    exit 12
+                                                    fi
+                                            ;;
+                                            y|Y|*)
+                                                printf "Keeping Default Download Path.\n"
+                                                    if [ -d $DIR ] && [ -w $DIR ]
+                                                        then
+                                                            printf "Default Directory was Found and Writable\n\n"
+                                                        else
+                                                            printf "Default Directory WAS NOT Found or WAS NOT Writable.\nExiting...\n"
+                                                            exit 2
+                                                    fi
+                                            ;;
+                                        esac
 
-
-                                    if [ -d $DIR ] && [ -w $DIR ]
-                                        then
-                                            printf "Directory was Found and Writable\n"
-                                        else
-                                            printf "Directory WAS NOT Found or WAS NOT Writable.\nExiting...\n"
-                                            exit 2
-                                    fi
-                                echo "Setting log Directory"
-                                LOG_LOCATION=/mnt/sda1/usb/aria2
+                                printf "Setting Log Directory\n"
+                                LOG_LOCATION=/tmp
+                                ## Prompt to changer Log Directory
+                                printf "Keep Log Location as Default? (Y/N)?\n"
+                                printf "Default: $LOG_LOCATION\n"
+                                read -n 1 C_LOG_LOCATION
+                                case $C_LOG_LOCATION in
+                                n|N)
+                                echo ""
+                                read -p 'Enter Log Path:   ' LOG_LOCATION                # custome directory and check
+                                if [ -d $LOG_LOCATION ] && [ -w $LOG_LOCATION ]
+                                then
+                                printf "\nLocation was Found and Writable\n"
+                                LOG=$LOG_LOCATION/aria2c.log
+                                else
+                                printf "Log WAS NOT Found or WAS NOT Writable.\nExiting...\n"
+                                exit 12
+                                fi
+                                ;;
+                                y|Y|*)
+                                    printf "\nKeeping Default Log Path.\n"
                                     if [ -d $LOG_LOCATION ] && [ -w $LOG_LOCATION ]
-                                        then
-                                            printf "Directory was Found and Writable\n"
-                                            sleep 1
-                                            touch $LOG_LOCATION/aria2c.log
-                                            LOG=$LOG_LOCATION/aria2c.log
-                                        else
-                                            printf "Directory WAS NOT Found or WAS NOT Writable.\nExiting...\n"
-                                            exit 3
+                                    then
+                                    printf "Location was Found and Writable\n"
+                                    sleep 1
+                                    touch $LOG_LOCATION/aria2c.log
+                                    LOG=$LOG_LOCATION/aria2c.log
+                                    else
+                                    printf "\nLocation WAS NOT Found or WAS NOT Writable.\nExiting...\n"
+                                    exit 3
                                     fi
+                                    ;;
+
+                                esac
+
                                 printf "Download Loation: $DIR\n"
                                 printf "Log Location: $LOG\n"
                                 touch /tmp/.aria2c
                                 CHECK1=/tmp/.aria2c
                                 echo "Continuing..."
                                 sleep 1
-#read ok
+read ok
                                 ;;
                         i|I)            # iOS
                                 printf "\nStarting..."
