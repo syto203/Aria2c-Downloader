@@ -18,21 +18,23 @@ MAX=16                                            #
 THREADS=16                                        #
 SEG=1M                                            #
 ###################################################
-
-#                   __         _______________  ________
-#    _________.__._/  |_  ____ \_____  \   _  \ \_____  \
-#   /  ___<   |  |\   __\/  _ \ /  ____/  /_\  \  _(__  <
-#   \___ \ \___  | |  | (  <_> )       \  \_/   \/       \
-#  /____  >/ ____| |__|  \____/\_______ \_____  /______  /
-#       \/ \/                          \/     \/       \/
-#             ________                      .__                    .___
-#             \______ \   ______  _  ______ |  |   _________     __| _/___________
-#              |    |  \ /  _ \ \/ \/ /    \|  |  /  _ \__  \   / __ |/ __ \_  __ \
-#              |    `   (  <_> )     /   |  \  |_(  <_> ) __ \_/ /_/ \  ___/|  | \/
-#             /_______  /\____/ \/\_/|___|  /____/\____(____  /\____ |\___  >__|
-#                     \/                  \/                \/      \/    \/
-
-
+#   Ascii Art using (http://patorjk.com) #
+clear
+echo "                 __         _______________  ________/\       ";
+echo "  _________.__._/  |_  ____ \_____  \   _  \ \_____  )/ ______";
+echo " /  ___<   |  |\   __\/  _ \ /  ____/  /_\  \  _(__  < /  ___/";
+echo " \___ \ \___  | |  | (  <_> )       \  \_/   \/       \\___ \ ";
+echo "/____  >/ ____| |__|  \____/\_______ \_____  /______  /____  >";
+echo "     \/ \/                          \/     \/       \/     \/ ";
+#
+echo "      ________                      .__                    .___            ";
+echo "      \______ \   ______  _  ______ |  |   _________     __| _/___________ ";
+echo "       |    |  \ /  _ \ \/ \/ /    \|  |  /  _ \__  \   / __ |/ __ \_  __ \ ";
+echo "       |    \`   (  <_> )     /   |  \  |_(  <_> ) __ \_/ /_/ \  ___/|  | \/";
+echo "      /_______  /\____/ \/\_/|___|  /____/\____(____  /\____ |\___  >__|   ";
+echo "              \/                  \/                \/      \/    \/       ";
+sleep 1
+#
 printf "Welcome\n"
 #CHOICE2=$1
 printf "Make Your Choice\n"
@@ -102,7 +104,18 @@ case $CHOICE in
         printf " Press '"z"' to use Custom Download locations \n"
                 read -n 1 OS
                     case $OS in
+
                         o|O)            # OpenWRT
+                                    printf "\nStarting..."
+                                    clear
+                                    echo "   ____               __          _______ _______ ";
+                                    echo "  / __ \              \ \        / /  __ \__   __|";
+                                    echo " | |  | |_ __   ___ _ _\ \  /\  / /| |__) | | |   ";
+                                    echo " | |  | | '_ \ / _ \ '_ \ \/  \/ / |  _  /  | |   ";
+                                    echo " | |__| | |_) |  __/ | | \  /\  /  | | \ \  | |   ";
+                                    echo "  \____/| .__/ \___|_| |_|\/  \/   |_|  \_\ |_|   ";
+                                    echo "        | |                                       ";
+                                    echo "        |_|                                       ";
                                 SET_ARIA2C=/usr/bin/aria2c                        # Default for OpenWRT and iOS
                                     if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]                             # check binary existance and executable permissions.
                                         then
@@ -114,6 +127,9 @@ case $CHOICE in
                                 echo "Setting Work Directories"
                                 echo "Setting Download Directory"
                                 DIR=/mnt/sda1/usb/video
+## Prompt to changer Download Directory
+
+
                                     if [ -d $DIR ] && [ -w $DIR ]
                                         then
                                             printf "Directory was Found and Writable\n"
@@ -133,8 +149,8 @@ case $CHOICE in
                                             printf "Directory WAS NOT Found or WAS NOT Writable.\nExiting...\n"
                                             exit 3
                                     fi
-                                echo "$DIR"
-                                echo "$LOG"
+                                printf "Download Loation: $DIR\n"
+                                printf "Log Location: $LOG\n"
                                 touch /tmp/.aria2c
                                 CHECK1=/tmp/.aria2c
                                 echo "Continuing..."
@@ -142,6 +158,16 @@ case $CHOICE in
 #read ok
                                 ;;
                         i|I)            # iOS
+                                printf "\nStarting..."
+                                clear
+                                echo "  _    ____     _____ ";
+                                echo " (_)  / __ \   / ____|";
+                                echo "  _  | |  | | | (___  ";
+                                echo " | | | |  | |  \___ \ ";
+                                echo " | | | |__| |  ____) |";
+                                echo " |_|  \____/  |_____/ ";
+                                echo "                      ";
+                                echo "                      ";
                                 SET_ARIA2C=/usr/bin/aria2c                        # Default for OpenWRT and iOS
                                 printf "aria2c was found at "$SET_ARIA2C"\n"
                                 [ -x $SET_ARIA2C ] && echo "aria2c has correct permissions" || echo "aria2c wasn't found or doesnt have correct permissions"
@@ -165,17 +191,16 @@ case $CHOICE in
                                 ;;
                         m|M)            # Mac OS
 
-
-
-
-echo "  __  __                 ____   _____ ";
-echo " |  \/  |               / __ \ / ____|";
-echo " | \  / | __ _  ___    | |  | | (___  ";
-echo " | |\/| |/ _\` |/ __|   | |  | |\___ \ ";
-echo " | |  | | (_| | (__    | |__| |____) |";
-echo " |_|  |_|\__,_|\___|    \____/|_____/ ";
-echo "                                      ";
-echo "                                      ";
+                                printf "\nStarting..."
+                                clear
+                                echo "  __  __                 ____   _____ ";
+                                echo " |  \/  |               / __ \ / ____|";
+                                echo " | \  / | __ _  ___    | |  | | (___  ";
+                                echo " | |\/| |/ _\` |/ __|   | |  | |\___ \ ";
+                                echo " | |  | | (_| | (__    | |__| |____) |";
+                                echo " |_|  |_|\__,_|\___|    \____/|_____/ ";
+                                echo "                                      ";
+                                echo "                                      ";
 
 
                                 SET2_ARIA2C=/usr/local/bin/aria2c                 # Default for MacOS via homebrew
@@ -195,16 +220,37 @@ echo "                                      ";
 #read ok
                                 ;;
                         z|Z)                                                    # Custom Inputs
-                                echo " "
+                                printf "\nStarting..."
+                                clear
+                                #
+                                echo "_________                 __                      ";
+                                echo "\_   ___ \ __ __  _______/  |_  ____   _____      ";
+                                echo "/    \  \/|  |  \/  ___/\   __\/  _ \ /     \     ";
+                                echo "\     \___|  |  /\___ \  |  | (  <_> )  Y Y  \    ";
+                                echo " \______  /____//____  > |__|  \____/|__|_|  /    ";
+                                echo "        \/           \/                    \/     ";
+                                echo "       .___                 __         .__  .__   ";
+                                echo "       |   | ____   _______/  |______  |  | |  |  ";
+                                echo "       |   |/    \ /  ___/\   __\__  \ |  | |  |  ";
+                                echo "       |   |   |  \\___ \  |  |  / __ \|  |_|  |__";
+                                echo "       |___|___|  /____  > |__| (____  /____/____/";
+                                echo "                \/     \/            \/           ";
+                                #
                                 read -p "Aria2c's Binary Location (default= /usr/bin/aria2c):   " SET_ARIA2C
                                             if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]
                                                 then
+                                                        if  [ -d $SET_ARIA2C ]      #check if only the directory was entered.
+                                                        then
+                                                        print "\nError!!\n"
+                                                        printf "You Must Enter the Full Path to the Binary File\n"
+                                                        exit 10
+                                                        fi
                                                     printf "A Binary was Found and it has Correct Permissions\n"
                                                 else
                                                     printf "aria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
                                                     exit 11
                                             fi
-                                read -p 'Enter Download Path:   ' DIR
+                                read -p 'Enter Download Path:   ' DIR                # custome directory and check
                                             if [ -d $DIR ] && [ -w $DIR ]
                                                 then
                                                     printf "Directory was Found and Writable\n"
@@ -289,7 +335,7 @@ echo "--****------****--"
             echo "aria2c "-d" "$DIR " -c -s "$THREADS" -x "$MAX" -k "$SEG" "$URL "> "$LOG" 2>&1 &"
             echo "--****------****----****------****----****------****----****------****----****------****--"
 ### Change output filename ###
-read -p 'Want to change Output Filename y/n?' -n 1 FNAME
+read -p 'Keep Original Filename (Y/N)?' -n 1 FNAME
 echo " "
     case $FNAME in
         y|Y)
@@ -309,9 +355,8 @@ echo " "
             $SET_ARIA2C -d $DIR -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
             ;;
         *)
-            echo " "
-            printf "You Didn't Choose. Exiting...\n"
-            exit 10
+            echo "Didnt change Name"
+            $SET_ARIA2C -d $DIR -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
             ;;
     esac
 #
@@ -357,11 +402,11 @@ echo "                                      ";
             echo "aria2c "-d" "$DIR2 " -c -s "$THREADS" -x "$MAX" -k "$SEG" "$URL "> "$LOG2" 2>&1 &"
             echo "--****------****----****------****----****------****----****------****----****------****--"
 ### Change output filename ###
-read -p 'Want to change Output Filename y/n?' -n 1 FNAME
+read -p 'Keep Original Filename (Y/N)?' -n 1 FNAME
 echo " "
     case $FNAME in
         y|Y)
-            echo "Enter Filename: (Don't forget the Extension)"
+            echo "\nEnter Filename: (Don't forget the Extension)\n"
             read OFNAME
             echo "The Following will now Run."
             echo "--****------****----****------****----****------****----****------****----****------****--"
@@ -373,15 +418,13 @@ echo " "
             $SET_ARIA2C2 -d $DIR2 -o $OFNAME -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG2 2>&1 &
             ;;
         n|N)
-            echo "Didnt change Name"
+            echo "\nDidnt change Name\n"
             $SET_ARIA2C2 -d $DIR2 -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG2 2>&1 &
             ;;
         *)
-            echo " "
-            printf "You Didn't Choose. Exiting...\n"
-            exit 10
+            printf "\nDidnt change Name\n"
+            $SET_ARIA2C2 -d $DIR2 -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG2 2>&1 &
             ;;
-
             esac
 #
 #
@@ -450,6 +493,7 @@ fi
                     printf "Press ""D"" to Disable MiniDLNA Service\n"
                     printf "Press ""L"" to Reload MiniDLNA Service\n"
                     printf "Press ""R"" to Restart MiniDLNA Service\n"
+                    printf "Press ""B"" to Delete Current MiniDLNA Database\n"
                     printf "Press ""Q"" to Quit MiniDLNA Service Manager\n"
 
                         read -n 1 MANAGE
@@ -486,37 +530,42 @@ fi
                                 printf "Restart Finished\n"
                                 ;;
                             b|B)
-printf "\nIf your database is large it will take sometime to Populate\n"
-printf "Delete Databse file too? (Y/N)\n"
-read -n 1 DEL_DB1
-case $DEL_DB1 in
-    y|Y)
-        printf "\nAre You Sure? (Y/N)\n"
-            read -n1 DEL_DB2
-                case $DEL_DB2 in
-                    n|N)
-                        echo "\nDatabase File NOT deleted"
-                    ;;
-                    y|Y)
-                        printf "\nLocating and Deleteing Database...\n"
-                        uci show minidlna | awk -F"'" '/db_dir/{print $2}' | ( read DB; (rm $DB/files.db) && printf "Database Deleted\n" || printf " \nDatabase file is already Deleted\n")
-                        printf "Restart the MiniDLNA service to re-make and Populate your Database\n"
-                    ;;
-                esac     # End Inner case switch
-    ;;
-    n|N)
-        echo "\ncool cool cool"
-    ;;
-esac
-;; # end of b|B)
+                                printf "\nIf your database is large it will take sometime to Populate\n"
+                                printf "Delete Databse file too? (Y/N)\n"
+                                read -n 1 DEL_DB1
+                                case $DEL_DB1 in
+                                    y|Y)
+                                        printf "\nAre You Sure? (Y/N)\n"
+                                            read -n1 DEL_DB2
+                                                case $DEL_DB2 in
+                                                    n|N)
+                                                        echo "\nDatabase File NOT deleted"
+                                                        ;;
+                                                    y|Y)
+                                                        printf "\nLocating and Deleteing Database...\n"
+                                                        uci show minidlna | awk -F"'" '/db_dir/{print $2}' | ( read DB; (rm $DB/files.db) && printf "Database Deleted\n" || printf " \nDatabase file is already Deleted\n")
+                                                        printf "Restart the MiniDLNA service to re-make and Populate your Database\n"
+                                                        ;;
+                                                esac     # End Inner case switch
+                                    ;;
+                                    n|N)
+                                        echo "\ncool cool cool"
+                                    ;;
+                                esac
+                                ;; # end of b|B)
                             q|Q)                        # Quit
                                 printf "\nExiting\n"
                                 break
-                            ;;
+                                ;;
+                            *)
+                                echo " "
+                                printf "You Didn't Choose. Exiting...\n"
+                                exit 10
+                                ;;
                             esac                        # Selector End
-##################################################################
+###########################################################
 ############ End of MiniDLNA Service Manager ##############
-##################################################################
+###########################################################
         ;;         # End of Manage MiniDLNA Service Manager from script's starting Case.
 
         *)                      # if you enter anything other than what's specified. Must be the last case
