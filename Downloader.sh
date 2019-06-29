@@ -48,8 +48,26 @@ echo " "
 case $CHOICE in
         p|P)                # Memory Manager
                 clear
+#
+                echo "___  ___ ________  ________________   __";
+                echo "|  \/  ||  ___|  \/  |  _  | ___ \ \ / /";
+                echo "| .  . || |__ | .  . | | | | |_/ /\ V / ";
+                echo "| |\/| ||  __|| |\/| | | | |    /  \ /  ";
+                echo "| |  | || |___| |  | \ \_/ / |\ \  | |  ";
+                echo "\_|  |_/\____/\_|  |_/\___/\_| \_| \_/  ";
+                echo "                                        ";
+                echo "                                        ";
+                echo " _____ _____  _____ _                   ";
+                echo "|_   _|  _  ||  _  | |                  ";
+                echo "  | | | | | || | | | |                  ";
+                echo "  | | | | | || | | | |                  ";
+                echo "  | | \ \_/ /\ \_/ / |____              ";
+                echo "  \_/  \___/  \___/\_____/              ";
+                echo "                                        ";
+                echo "                                        ";
+#
                 printf "\n***************************\n"
-                printf "* MiniDLNA Service Manager *\n"
+                printf "* Memory Tool *\n"
                 printf "***************************\n\n"
                 printf " How Can I Help You Today\n"
                 printf "---------------.\n"
@@ -61,7 +79,7 @@ case $CHOICE in
                             c|C)            # Combo Choice
                             ################## pagecache clearer ####################
                             printf " "
-                            printf "Purging...\n"
+                            printf "\nPurging...\n"
                             printf "Before\n"
                             printf "-------------------------.\n"
                             free -m                                         ## check free memory.
@@ -73,17 +91,21 @@ case $CHOICE in
                             printf "-------------------------.\n"
                             printf "Done\n"
                             sleep 1
-                            ;;
+                                ;;
                             f|F)        # check just free memory.
                                 printf "\nCurrent Memory State\n"
                                 printf "-------------------------.\n"
                                 free -m
                                 printf "-------------------------.\n"
-                            ;;
+                                ;;
                             p|P)
-                                printf "Purging...\n"
+                                printf "\nPurging...\n"
                                 echo 1 > /proc/sys/vm/drop_caches
-                            ;;
+                                ;;
+                            *)
+                                printf "\nExiting...\n"
+                                exit 1
+                                ;;
                     esac
                             ################## End of pagecache clearer ####################
 
@@ -557,6 +579,16 @@ read -n1 INPUT
 #####################################################
         m|M)        # Manage MiniDLNA
                     clear
+#
+                    echo "___  ____       _______ _      _   _   ___  ";
+                    echo "|  \/  (_)     (_)  _  \ |    | \ | | / _ \ ";
+                    echo "| .  . |_ _ __  _| | | | |    |  \| |/ /_\ \ ";
+                    echo "| |\/| | | '_ \| | | | | |    | . \` ||  _  |";
+                    echo "| |  | | | | | | | |/ /| |____| |\  || | | |";
+                    echo "\_|  |_/_|_| |_|_|___/ \_____/\_| \_/\_| |_/";
+                    echo "                                            ";
+                    echo "                                            ";
+#
                     printf "\n***************************\n"
                     printf "* MiniDLNA Service Manager *\n"
                     printf "***************************\n"
