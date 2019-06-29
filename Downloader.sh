@@ -95,7 +95,7 @@ case $CHOICE in
                 sleep 1
 ####################################### aria2c's defaults #################################
 #SET_ARIA2C=/usr/bin/aria2c                        # Default for OpenWRT and iOS
-#SET2_ARIA2C=/usr/local/bin/aria2c                 # Default for MacOS via homebrew (brew install aria2
+#SET_ARIA2C=/usr/local/bin/aria2c                 # Default for MacOS via homebrew (brew install aria2
 #######################################################################################################
 #######################################################################################################
 ################################### OS Selector #######################################
@@ -229,7 +229,7 @@ case $CHOICE in
                                 CHECK1=/tmp/.aria2c
                                 echo "Continuing..."
                                 sleep 1
-read ok
+#read ok
                                 ;;
                         i|I)            # iOS
                                 printf "\nStarting..."
@@ -350,7 +350,7 @@ read ok
                                 CHECK1=/tmp/.aria2c
                                 echo "Continuing..."
                                 sleep 1
-                                read ok
+#read ok
                                 ;;
                         m|M)            # Mac OS
 
@@ -366,21 +366,25 @@ read ok
                                 echo "                                      ";
 
 
-                                SET2_ARIA2C=/usr/local/bin/aria2c                 # Default for MacOS via homebrew
-                                printf "aria2c was found at "$SET2_ARIA2C"\n"
-                                [ -x $SET2_ARIA2C ] && echo "aria2c has correct permissions" || echo "aria2c wasn't found or doesnt have correct permissions"
+                                SET_ARIA2C=/usr/local/bin/aria2c                 # Default for MacOS via homebrew
+                                if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]                             # check binary existance and executable permissions.
+                                    then
+                                        printf "A Binary was Found and it has Correct Permissions\n"
+                                    else
+                                        printf "aria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
+                                        exit 1
+                                fi
                                 echo "aria2c has correct permissions"
                                 echo "Setting Working Directories"
-                                DIR2=~/Downloads/
+                                DIR=~/Downloads/
                                 mkdir -p ~/Documents/aria2/
-                                LOG2=~/Documents/aria2/aria2c.log
-                                echo "Download Location= $DIR2"
-                                echo "Log Location= $LOG2"
+                                LOG=/tmp/aria2c.log
+                                echo "Download Location= "$DIR""
+                                echo "Log Location= "$LOG""
                                 touch /tmp/.aria2c
-                                CHECK2=/tmp/.aria2c
                                 echo "Continuing..."
                                 sleep 1
-#read ok
+read ok
                                 ;;
                         z|Z)                                                    # Custom Inputs
                                 printf "\nStarting..."
@@ -488,10 +492,6 @@ echo "--****------****--"
 # read -p 'Log Location=     ' LOG
 # reap -p 'Segment Size=     ' SEGMENT
 ##########################################################################
-#### OS Check Then Download ####
-    if [ -e "$CHECK1" ]         #check if the temp file exists
-        then                    #in order to use the correct DIR and LOG
-#echo "Check 1"
             echo "The Following will now Run."
             echo "--****------****----****------****----****------****----****------****----****------****--"
             echo "        Path-˯     Threads     Max Conn.     Segment Size      Log Location          "
@@ -543,94 +543,6 @@ read -n1 INPUT
                     break
                     ;;
             esac
-    elif [ -e "$CHECK2" ]                   #check if the temp file exists
-        then                                #in order to use the correct DIR and LOG
-#echo "Check 2"
-
-
-echo "  __  __                 ____   _____ ";
-echo " |  \/  |               / __ \ / ____|";
-echo " | \  / | __ _  ___    | |  | | (___  ";
-echo " | |\/| |/ _\` |/ __|   | |  | |\___ \ ";
-echo " | |  | | (_| | (__    | |__| |____) |";
-echo " |_|  |_|\__,_|\___|    \____/|_____/ ";
-echo "                                      ";
-echo "                                      ";
-
-
-#
-            echo "The Following will now Run."
-            echo "--****------****----****------****----****------****----****------****----****------****--"
-                echo "        Path-˯     Threads     Max Conn.     Segment Size      Log Location          "
-            echo "aria2c "-d" "$DIR2 " -c -s "$THREADS" -x "$MAX" -k "$SEG" "$URL "> "$LOG2" 2>&1 &"
-            echo "--****------****----****------****----****------****----****------****----****------****--"
-### Change output filename ###
-read -p 'Keep Original Filename (Y/N)?' -n 1 FNAME
-echo " "
-    case $FNAME in
-        y|Y)
-            echo "\nEnter Filename: (Don't forget the Extension)\n"
-            read OFNAME
-            echo "The Following will now Run."
-            echo "--****------****----****------****----****------****----****------****----****------****--"
-            echo "Path+filename-˯     Threads     Max Conn.     Segment Size      Log Location          "
-            echo "aria2c "-d" "$DIR2 ""-o" "$OFNAME " -c "-s" "$THREADS" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG2" 2>&1 &"
-            echo "--****------****----****------****----****------****----****------****----****------****--"
-            echo "Press Enter to Continue"
-            read ok
-            $SET_ARIA2C2 -d $DIR2 -o $OFNAME -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG2 2>&1 &
-            ;;
-        n|N)
-            echo "\nDidnt change Name\n"
-            $SET_ARIA2C2 -d $DIR2 -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG2 2>&1 &
-            ;;
-        *)
-            printf "\nDidnt change Name\n"
-            $SET_ARIA2C2 -d $DIR2 -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG2 2>&1 &
-            ;;
-            esac
-#
-#
-echo "Initiating......"
-sleep 1
-echo "The Download is in the Background"
-echo "Your Download Location is $DIR2"
-echo "Your Log Location is $LOG2"
-echo "You can Run "tail -f "$LOG2"" to Monitor the Status,\n"
-echo "Press M to monitor or Anythhing else to Exit"
-read -n1 INPUT
-        case $INPUT in
-                m|M)
-                clear; printf "Monitoring....\n"
-                sleep 2
-                tail -f $LOG2
-                ;;
-                *)
-                printf "Exiting.....\n"
-                sleep 1
-                break
-                ;;
-        esac
-    else
-        echo " something wrong occured. check your inputs"
-                    if [ -e "$CHECK1" ]
-                        then
-                            echo " URL: "$URL""
-                            echo " Download Location: "$DIR""
-                            echo " Log Location: "$LOG""
-                    elif [ -e "$CHECK2" ]
-                        then
-                            echo " URL: "$URL""
-                            echo " Download Location: "$DIR2""
-                            echo " Log Location: "$LOG2""
-#                    else
-#                        exit 4
-                    fi
-
-        echo " Press Enter to Exit"
-        read ok
-        break
-fi
 ;;
 #########################################################
 ############ End of Aria2c Downloader Script#############
