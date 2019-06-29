@@ -520,28 +520,31 @@ sleep 1
             printf "Keep Original Filename (Y/N)?\n"
             read -n 1 FNAME
             echo " "
-                case $FNAME in
-                    y|Y)
+change_name (){
+                case $1 in
+                    n|N)
                         echo "Enter Filename: (Don't forget the Extension)"
-                        read OFNAME
+                        read CUSTOM_FNAME
                         echo "The Following will now Run."
                         echo "--****------****----****------****----****------****----****------****----****------****--"
                         echo "Path+filename-˯     Threads     Max Conn.     Segment Size      Log Location          "
-                        echo "aria2c "-d" "$DIR ""-o" "$OFNAME " -c "-s" "$THREADS" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
+                        echo "aria2c "-d" "$DIR ""-o" "$CUSTOM_FNAME " -c "-s" "$THREADS" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
                         echo "--****------****----****------****----****------****----****------****----****------****--"
                         echo "Press Enter to Continue"
                         read ok
-                        $SET_ARIA2C -d $DIR -o $OFNAME -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+                        $SET_ARIA2C -d $DIR -o $CUSTOM_FNAME -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
                         ;;
-                    n|N)
+                    y|Y|*)
                         echo "Didnt change Name"
                         $SET_ARIA2C -d $DIR -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
-                        ;;
-                    *)
-                        echo "Didnt change Name"
-                        $SET_ARIA2C -d $DIR -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+read ok
                         ;;
                 esac
+}
+#Function to Change Name
+change_name $FNAME
+
+
 #
 #
 #
