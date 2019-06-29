@@ -492,21 +492,6 @@ read ok
 clear
 sleep 1
 #
-echo "*************************"
-echo "* Aria2 Auto-Downloader *"
-echo "*************************"
-echo "Hi,"
-echo "Input Download Link."
-echo "----------------"
-read -p 'Link= ' URL
-echo " "
-echo "##################################################################"
-echo "You Entered"
-echo $URL
-echo "##################################################################"
-sleep 1
-#####################################
-echo "--****------****--"
 ##########################################################################
 # *Extra Options* (comment out the fixed variables first)
 # read -p 'Threads =    (smaller or equal to max connections)' THREADS
@@ -514,36 +499,49 @@ echo "--****------****--"
 # read -p 'Log Location=     ' LOG
 # reap -p 'Segment Size=     ' SEGMENT
 ##########################################################################
+            echo "*************************"
+            echo "* Aria2 Auto-Downloader *"
+            echo "*************************"
+            echo "Hi,"
+            echo "Input Download Link."
+            echo "----------------"
+            read -p 'Link= ' URL
+            echo " "
+            echo "##################################################################"
+            echo "You Entered"
+            echo $URL
+            echo "##################################################################"
             echo "The Following will now Run."
             echo "--****------****----****------****----****------****----****------****----****------****--"
             echo "        Path-˯     Threads     Max Conn.     Segment Size      Log Location          "
             echo "aria2c "-d" "$DIR " -c -s "$THREADS" -x "$MAX" -k "$SEG" "$URL "> "$LOG" 2>&1 &"
             echo "--****------****----****------****----****------****----****------****----****------****--"
-### Change output filename ###
-read -p 'Keep Original Filename (Y/N)?' -n 1 FNAME
-echo " "
-    case $FNAME in
-        y|Y)
-            echo "Enter Filename: (Don't forget the Extension)"
-            read OFNAME
-            echo "The Following will now Run."
-            echo "--****------****----****------****----****------****----****------****----****------****--"
-            echo "Path+filename-˯     Threads     Max Conn.     Segment Size      Log Location          "
-            echo "aria2c "-d" "$DIR ""-o" "$OFNAME " -c "-s" "$THREADS" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
-            echo "--****------****----****------****----****------****----****------****----****------****--"
-            echo "Press Enter to Continue"
-            read ok
-            $SET_ARIA2C -d $DIR -o $OFNAME -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
-            ;;
-        n|N)
-            echo "Didnt change Name"
-            $SET_ARIA2C -d $DIR -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
-            ;;
-        *)
-            echo "Didnt change Name"
-            $SET_ARIA2C -d $DIR -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
-            ;;
-    esac
+            ### Change output filename ###
+            printf "Keep Original Filename (Y/N)?\n"
+            read -n 1 FNAME
+            echo " "
+                case $FNAME in
+                    y|Y)
+                        echo "Enter Filename: (Don't forget the Extension)"
+                        read OFNAME
+                        echo "The Following will now Run."
+                        echo "--****------****----****------****----****------****----****------****----****------****--"
+                        echo "Path+filename-˯     Threads     Max Conn.     Segment Size      Log Location          "
+                        echo "aria2c "-d" "$DIR ""-o" "$OFNAME " -c "-s" "$THREADS" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
+                        echo "--****------****----****------****----****------****----****------****----****------****--"
+                        echo "Press Enter to Continue"
+                        read ok
+                        $SET_ARIA2C -d $DIR -o $OFNAME -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+                        ;;
+                    n|N)
+                        echo "Didnt change Name"
+                        $SET_ARIA2C -d $DIR -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+                        ;;
+                    *)
+                        echo "Didnt change Name"
+                        $SET_ARIA2C -d $DIR -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+                        ;;
+                esac
 #
 #
 #
