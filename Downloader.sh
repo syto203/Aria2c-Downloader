@@ -2,15 +2,131 @@
 ###########################################################################
 # Dependancies
 # assuming you have a functioning storage
-# opkg install aria2
+# visit https://aria2.github.io/
+# aria2c 1.34+
+# on OpenWRT/LEDE
+# $ opkg install aria2
+# Mac OS via homebrew
+# $ brew install aria2c
+# on iOS via Cydia
+#Sam Bingner's (https://apt.bingner.com) or Apollo's (https://mcapollo.github.io/Public) repo
 ###########################################################################
-#echo "** To-Do **"
-#echo "1-Running from current directory with aria2c in same path."
-#echo "2-Set the download and log to current path"
-#echo "3-Pass options via cli"
-#echo "4-Pre-set download locations to choose from"
-#printf  "5-Search for aria2c and use it wherever it is.\n\n\n\n"
+##############       Functions      ########################################
 ############################################################################
+
+# check if directory exits and writeable
+validate_download_directory () {
+if [ -d $1 ] && [ -w $1 ]
+    then
+        printf "Directory was Found and Writable\n\n"
+    else
+        printf "Error!!\n"
+        printf "Directory WAS NOT Found or WAS NOT Writable.\n"
+        create_missing_directory $1
+fi
+}
+
+#Function to Make Missing Directory
+create_missing_directory () {
+printf "Would you like to Create it? (y/n)\n"             #create Missing Directory
+read -n 1 MK_DEFAULT_DIR
+    case $MK_DEFAULT_DIR in
+    n|N)
+        printf "\nExiting...\n"
+        exit 2
+        ;;
+    y|Y|*)
+        mkdir -p $1
+        printf "Directory Created\n"
+        ;;
+    esac
+return 0
+}
+
+#set download location
+set_download_location () {
+## Prompt to changer Download Directory
+printf "\nKeep Download path as Default?  (default: /mnt/sda1/usb/video)\n (Y/N)?\n"
+read -n 1 C_DIR
+    case $C_DIR in
+        n|N)
+            echo ""
+            read -p 'Enter Download Path:   ' DIR         # custom directory and check
+            validate_download_directory $DIR              # check and create the directory if it doesnt exist.
+            ;;
+        y|Y|*)
+            printf "Keeping Default Download Path.\n"
+            validate_download_directory $DIR
+            ;;
+esac
+}
+
+#set aria's log location
+set_log_location () {
+printf "Keep Log Location as Default? (Y/N)?\n"
+printf "Default: /tmp \n"
+read -n 1 C_LOG_LOCATION
+    case $C_LOG_LOCATION in
+        n|N)
+            echo ""
+            read -p 'Enter Log Path:   ' LOG_LOCATION            # custom directory and check
+            validate_download_directory $LOG_LOCATION
+            LOG=$LOG_LOCATION/aria2c.log
+            ;;
+        y|Y|*)
+            LOG_LOCATION=/tmp
+            validate_download_directory $LOG_LOCATION
+            LOG=$LOG_LOCATION/aria2c.log
+            ;;
+    esac
+}
+
+#Function to Change Output Name
+change_downloaded_file_name (){
+case $1 in
+    n|N)
+        echo "Enter Filename: (Don't forget the Extension)"
+        read CUSTOM_FNAME
+        echo "The Following will now Run."
+        echo "--****------****----****------****----****------****----****------****----****------****--"
+        echo "Path+filename-˯     Threads     Max Conn.     Segment Size      Log Location          "
+        echo "aria2c "-d" "$DIR ""-o" "$CUSTOM_FNAME " -c "-s" "$THREADS" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
+        echo "--****------****----****------****----****------****----****------****----****------****--"
+        echo "Press Enter to Continue"
+        read ok
+        $SET_ARIA2C -d $DIR -o $CUSTOM_FNAME -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+        ;;
+    y|Y|*)
+        echo "Didnt change Name"
+        $SET_ARIA2C -d $DIR -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+        read ok
+        ;;
+esac
+}
+
+aria2c_check () {
+if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]             # Check if Binary Exists and Executable
+    then
+        if  [ -d $SET_ARIA2C ]      #check if only the directory was entered.
+            then
+                printf "\nError!!\n"
+                printf "You Must Enter the Full Path to the Binary File\n"
+                exit 10
+        fi
+    printf "A Binary was Found and it has Correct Permissions\n"
+    else
+        printf "aria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
+        exit 11
+fi
+}
+
+
+
+############################################################################
+##############      End of Functions      ##################################
+############################################################################
+
+
 ########### Setting Fixed Variables ###############
 SCRIPTNAME=$(basename $0)                         #
 SCRIPTPATH="${0%/*}"                              #
@@ -18,7 +134,7 @@ MAX=16                                            #
 THREADS=16                                        #
 SEG=1M                                            #
 ###################################################
-#   Ascii Art using (http://patorjk.com) #
+#   Ascii Art from (http://patorjk.com) #
 clear
 echo "                 __         _______________  ________/\       ";
 echo "  _________.__._/  |_  ____ \_____  \   _  \ \_____  )/ ______";
@@ -38,10 +154,10 @@ sleep 1
 printf "Welcome\n"
 #CHOICE2=$1
 printf "Make Your Choice\n"
-printf " ""P"" to Purge pagecache\n"
-printf " ""D"" to Download using Aria2\n"
-printf " ""M"" to start MiniDLNA Service Manager\n"
-printf " ""Q"" to Exit\n"
+printf " \"P\" to Open Memory Tool\n"
+printf " \"D\" to Open Aria2 Downloader\n"
+printf " \"M\" to Open MiniDLNA Service Manager\n"
+printf " \"Q\" to Exit\n"
 read -n 1 CHOICE
 echo " "
 
@@ -71,9 +187,9 @@ case $CHOICE in
                 printf "***************************\n\n"
                 printf " How Can I Help You Today\n"
                 printf "---------------.\n"
-                printf "Press ""C"" For Combo Choice\n"
-                printf "Press ""F"" to Check Current Memory\n"
-                printf "Press ""P"" For Droping pagecache\n"
+                printf "Press \"C\" For Combo Choice\n"
+                printf "Press \"F\" to Check Current Memory\n"
+                printf "Press \"P\" For Droping pagecache\n"
                 read -n 1 INPUT
                     case $INPUT in
                             c|C)            # Combo Choice
@@ -114,11 +230,6 @@ case $CHOICE in
                 clear
                 echo "Opening Downloader"
                 echo "Checking Aria2 installation and Permissions"
-                sleep 1
-####################################### aria2c's defaults #################################
-#SET_ARIA2C=/usr/bin/aria2c                        # Default for OpenWRT and iOS
-#SET_ARIA2C=/usr/local/bin/aria2c                 # Default for MacOS via homebrew (brew install aria2
-#######################################################################################################
 #######################################################################################################
 ################################### OS Selector #######################################
 #######################################################################################################
@@ -129,7 +240,7 @@ case $CHOICE in
         printf " Press 'm' for Mac OS\n "
         printf " Press 'z' to use Custom Download locations \n"
                 read -n 1 OS
-                    case $OS in
+                    case $OS in             # Start of OS Selector cases
 
                         o|O)            # OpenWRT
                                     printf "\nStarting..."
@@ -152,99 +263,10 @@ case $CHOICE in
                                     fi
                                 echo "Setting Work Directories"
                                 echo "Setting Download Directory"
-                                ## Prompt to changer Download Directory
-                                printf "Keep Download path as Default? (Y/N)?\n"
-                                printf "Default: /mnt/sda1/usb/video\n"
-                                    read -n 1 C_DIR
-                                        case $C_DIR in
-                                            n|N)
-                                                echo ""
-                                                read -p 'Enter Download Path:   ' DIR       # custom directory and check
-#mkdir -p $DIR                               # create the directory if it doesnt exist.
-                                                    if [ -d $DIR ] && [ -w $DIR ]
-                                                    then
-                                                        printf "Directory was Found and Writable\n"
-                                                    else
-                                                        printf "Error!!\n"
-                                                        printf "Directory WAS NOT Found or WAS NOT Writable.\nExiting...\n"
-                                                        exit 2
-                                                    fi
-                                            ;;
-                                            y|Y|*)
-
-                                                printf "Keeping Default Download Path.\n"
-                                                    DIR=/mnt/sda1/usb/video
-                                                    if [ -d $DIR ] && [ -w $DIR ]
-                                                        then
-                                                            printf "Default Directory was Found and Writable\n\n"
-                                                        else
-                                                            printf "Error!!\n"
-                                                            printf "Default Directory WAS NOT Found or WAS NOT Writable.\n"
-                                                            printf "Would you like to Create it? (y/n)\n"             #create Missing Directory
-                                                                read -n 1 MK_DEFAULT_DIR
-                                                                    case $MK_DEFAULT_DIR in
-                                                                        n|N)
-                                                                            printf "\nExiting...\n"
-                                                                            exit 2
-                                                                        ;;
-                                                                        y|Y|*)
-                                                                            mkdir -p $DIR
-                                                                            printf "Created Directory\n"
-                                                                        ;;
-                                                                    esac
-                                                    fi
-                                            ;;
-                                        esac
-
+                                DIR=/mnt/sda1/usb/video
+                                set_download_location
                                 printf "Setting Log Directory\n"
-                                ## Prompt to changer Log Directory
-                                printf "Keep Log Location as Default? (Y/N)?\n"
-                                printf "Default: /tmp \n"
-                                read -n 1 C_LOG_LOCATION
-                                    case $C_LOG_LOCATION in
-                                        n|N)
-                                            echo ""
-                                            read -p 'Enter Log Path:   ' LOG_LOCATION            # custom directory and check
-                                            mkdir -p $LOG_LOCATION                              # create the directory if it doesnt exist.
-                                                if [ -d $LOG_LOCATION ] && [ -w $LOG_LOCATION ]
-                                                    then
-                                                        printf "\nLocation was Found and Writable\n"
-                                                        LOG=$LOG_LOCATION/aria2c.log
-                                                    else
-                                                        printf "Error!!\n"
-                                                        printf "Log Location WAS NOT Found or WAS NOT Writable.\nExiting...\n"
-                                                        exit 2
-                                                fi
-                                            ;;
-                                        y|Y|*)
-                                            LOG_LOCATION=/tmp
-                                            printf "\nKeeping Default Log Path.\n"
-                                                if [ -d $LOG_LOCATION ] && [ -w $LOG_LOCATION ]
-                                                    then
-                                                        printf "Location was Found and Writable\n"
-                                                        touch $LOG_LOCATION/aria2c.log
-                                                        LOG=$LOG_LOCATION/aria2c.log
-                                                    else
-                                                        printf "Error!!\n"
-                                                        printf "\nLocation WAS NOT Found or WAS NOT Writable.\n"
-                                                        printf "Would you like to Create it? (y/n)"             #create Missing Directory
-                                                            read -n 1 MK_DEFAULT_DIR
-                                                                case $MK_DEFAULT_DIR in
-                                                                    n|N)
-                                                                        printf "Exiting...\n"
-                                                                        exit 2
-                                                                        ;;
-                                                                    y|Y|*)
-                                                                        mkdir -p $LOG_LOCATION
-                                                                        printf "Created Directory\n"
-                                                                        touch $LOG_LOCATION/aria2c.log
-                                                                        LOG=$LOG_LOCATION/aria2c.log
-                                                                        ;;
-                                                                esac
-                                                fi
-                                            ;;
-                                    esac
-
+                                set_log_location
                                 printf "Download Loation: "$DIR"\n"
                                 printf "Log Location: "$LOG"\n"
                                 touch /tmp/.aria2c
@@ -274,102 +296,12 @@ case $CHOICE in
                                     fi
                                 echo "Setting Work Directories"
                                 echo "Setting Download Directory"
-                                ## Prompt to changer Download Directory
-                                printf "Keep Download path as Default? (Y/N)?\n"
-                                printf "Default: /var/mobile/Downloads/video \n"
-                                read -n 1 C_DIR
-                                        case $C_DIR in
-                                            n|N)
-                                                echo ""
-                                                read -p 'Enter Download Path:   ' DIR       # custom directory and check
-                                                #mkdir -p $DIR                               # create the directory if it doesnt exist.
-                                                    if [ -d $DIR ] && [ -w $DIR ]
-                                                        then
-                                                            printf "Directory was Found and Writable\n"
-                                                        else
-                                                            printf "Error!!\n"
-                                                            printf "Directory WAS NOT Found or WAS NOT Writable.\nExiting...\n"
-                                                            exit 2
-                                                    fi
-                                                ;;
-                                            y|Y|*)
-                                                    printf "Keeping Default Download Path.\n"
-                                                    DIR=/var/mobile/Downloads/video
-                                                        if [ -d $DIR ] && [ -w $DIR ]
-                                                            then
-                                                                printf "Default Directory was Found and Writable\n\n"
-                                                            else
-                                                                printf "Error!!\n"
-                                                                printf "Default Directory WAS NOT Found or WAS NOT Writable.\n"
-                                                                printf "Would you like to Create it? (y/n)\n"             #create Missing Directory
-                                                                read -n 1 MK_DEFAULT_DIR
-                                                                    case $MK_DEFAULT_DIR in
-                                                                        n|N)
-                                                                            printf "\nExiting...\n"
-                                                                            exit 2
-                                                                            ;;
-                                                                        y|Y|*)
-                                                                            mkdir -p $DIR
-                                                                            printf "Created Directory\n"
-                                                                            ;;
-                                                                    esac
-                                                        fi
-                                                ;;
-                                        esac
-
-                                    printf "Setting Log Directory\n"
-                                    ## Prompt to changer Log Directory
-                                    printf "Keep Log Location as Default? (Y/N)?\n"
-                                    printf "Default: /tmp \n"
-                                    read -n 1 C_LOG_LOCATION
-                                        case $C_LOG_LOCATION in
-                                            n|N)
-                                                echo ""
-                                                read -p 'Enter Log Path:   ' LOG_LOCATION            # custom directory and check
-                                                mkdir -p $LOG_LOCATION                              # create the directory if it doesnt exist.
-                                                if [ -d $LOG_LOCATION ] && [ -w $LOG_LOCATION ]
-                                                    then
-                                                        printf "\nLocation was Found and Writable\n"
-                                                        LOG=$LOG_LOCATION/aria2c.log
-                                                    else
-                                                        printf "Error!!\n"
-                                                        printf "Log Location WAS NOT Found or WAS NOT Writable.\nExiting...\n"
-                                                        exit 2
-                                                fi
-                                                ;;
-                                            y|Y|*)
-                                                LOG_LOCATION=/tmp
-                                                printf "\nKeeping Default Log Path.\n"
-                                                if [ -d $LOG_LOCATION ] && [ -w $LOG_LOCATION ]
-                                                    then
-                                                        printf "Location was Found and Writable\n"
-                                                        touch $LOG_LOCATION/aria2c.log
-                                                        LOG=$LOG_LOCATION/aria2c.log
-                                                    else
-                                                        printf "Error!!\n"
-                                                        printf "\nLocation WAS NOT Found or WAS NOT Writable.\n"
-                                                        printf "Would you like to Create it? (y/n)"             #create Missing Directory
-                                                        read -n 1 MK_DEFAULT_DIR
-                                                            case $MK_DEFAULT_DIR in
-                                                                n|N)
-                                                                    printf "Exiting...\n"
-                                                                    exit 2
-                                                                    ;;
-                                                                y|Y|*)
-                                                                    mkdir -p $LOG_LOCATION
-                                                                    printf "Created Directory\n"
-                                                                    touch $LOG_LOCATION/aria2c.log
-                                                                    LOG=$LOG_LOCATION/aria2c.log
-                                                                    ;;
-                                                            esac
-                                                fi
-                                                ;;
-                                        esac
-
+                                DIR=/var/mobile/Downloads
+                                set_download_location
+                                printf "Setting Log Directory\n"
+                                set_log_location
                                 printf "Download Loation: "$DIR"\n"
                                 printf "Log Location: "$LOG"\n"
-                                touch /tmp/.aria2c
-                                CHECK1=/tmp/.aria2c
                                 echo "Continuing..."
                                 sleep 1
 #read ok
@@ -389,7 +321,7 @@ case $CHOICE in
 
 
                                 SET_ARIA2C=/usr/local/bin/aria2c                 # Default for MacOS via homebrew
-                                if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]                             # check binary existance and executable permissions.
+                                if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]         # check binary existance and executable permissions.
                                     then
                                         printf "A Binary was Found and it has Correct Permissions\n"
                                     else
@@ -398,15 +330,17 @@ case $CHOICE in
                                 fi
                                 echo "aria2c has correct permissions"
                                 echo "Setting Working Directories"
-                                DIR=~/Downloads/
-                                mkdir -p ~/Documents/aria2/
-                                LOG=/tmp/aria2c.log
+                                echo "Setting Download Directory"
+                                DIR=~/Downloads
+                                set_download_location
+                                echo "Setting Log Directory"
+                                set_log_location
                                 echo "Download Location= "$DIR""
                                 echo "Log Location= "$LOG""
                                 touch /tmp/.aria2c
                                 echo "Continuing..."
                                 sleep 1
-read ok
+#read ok
                                 ;;
                         z|Z)                                                    # Custom Inputs
                                 printf "\nStarting..."
@@ -426,65 +360,21 @@ read ok
                                 echo "                \/     \/            \/           ";
                                 #
                                 read -p "Aria2c's Binary Location (default= /usr/bin/aria2c):   " SET_ARIA2C
-                                            if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]
-                                                then
-                                                        if  [ -d $SET_ARIA2C ]      #check if only the directory was entered.
-                                                        then
-                                                        print "\nError!!\n"
-                                                        printf "You Must Enter the Full Path to the Binary File\n"
-                                                        exit 10
-                                                        fi
-                                                    printf "A Binary was Found and it has Correct Permissions\n"
-                                                else
-                                                    printf "aria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
-                                                    exit 11
-                                            fi
+                                aria2c_check $SET_ARIA2C
                                 read -p 'Enter Download Path:   ' DIR                # custome directory and check
-                                            if [ -d $DIR ] && [ -w $DIR ]
-                                                then
-                                                    printf "Directory was Found and Writable\n"
-                                                else
-                                                    printf "Directory WAS NOT Found or WAS NOT Writable.\nExiting...\n"
-                                                    exit 12
-                                            fi
-                                read -p ' Custom log path? (y/n) ' -n 1 SET_LOG
-                                echo " "
-                                    case $SET_LOG in
-                                        y|Y)
-                                            read -p 'Enter log path:   ' LOG_LOCATION
-                                            echo " "
-                                            if [ -d $LOG_LOCATION ] && [ -w $LOG_LOCATION ]
-                                                then
-                                                    printf "Directory was Found and Writable\n"
-                                                    sleep 1
-                                                    touch $LOG_LOCATION/aria2c.log
-                                                    LOG=$LOG_LOCATION/aria2c.log
-                                                else
-                                                    printf "Directory WAS NOT Found or WAS NOT Writable.\nExiting...\n"
-                                                    exit 13
-                                            fi
-                                            ;;
-                                        n|N)
-                                            printf "Using Default Path\n"
-                                            LOG=/tmp/aria2c.log
-                                            ;;
-                                        *)
-                                            echo " "
-                                            printf "You Didn't Choose.\n"
-                                            printf "Using Default Log Path\n"
-                                            sleep 1
-                                            LOG=/tmp/aria2c.log
-                                            ;;
-                                            esac
-                                touch /tmp/.aria2c
-                                CHECK1=/tmp/.aria2c
-                                ;;
-                        *)
-                                echo " "
-                                printf "You Didn't Choose. Exiting...\n"
-                                exit 10
-                                ;;
-                                esac
+                                validate_download_directory $DIR
+                                printf "Setting Log Directory\n"
+                                set_log_location
+                                printf "Download Loation: "$DIR"\n"
+                                printf "Log Location: "$LOG"\n"
+                                echo "Continuing..."
+                                sleep 1
+                                ;;      #custom install case
+                    *)
+                            printf "\nYou Didn't Choose. Exiting...\n"
+                            exit 10
+                            ;;
+    esac                # End of OS Selector cases
 
 #########################################################################
 ################### Start of Download Script ############################
@@ -496,8 +386,7 @@ sleep 1
 # *Extra Options* (comment out the fixed variables first)
 # read -p 'Threads =    (smaller or equal to max connections)' THREADS
 # read -p 'Max Connections=    (bigger or equal to max connections)' MAX
-# read -p 'Log Location=     ' LOG
-# reap -p 'Segment Size=     ' SEGMENT
+# reap -p 'Segment Size=     ' SEG
 ##########################################################################
             echo "*************************"
             echo "* Aria2 Auto-Downloader *"
@@ -520,29 +409,7 @@ sleep 1
             printf "Keep Original Filename (Y/N)?\n"
             read -n 1 FNAME
             echo " "
-change_name (){
-                case $1 in
-                    n|N)
-                        echo "Enter Filename: (Don't forget the Extension)"
-                        read CUSTOM_FNAME
-                        echo "The Following will now Run."
-                        echo "--****------****----****------****----****------****----****------****----****------****--"
-                        echo "Path+filename-˯     Threads     Max Conn.     Segment Size      Log Location          "
-                        echo "aria2c "-d" "$DIR ""-o" "$CUSTOM_FNAME " -c "-s" "$THREADS" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
-                        echo "--****------****----****------****----****------****----****------****----****------****--"
-                        echo "Press Enter to Continue"
-                        read ok
-                        $SET_ARIA2C -d $DIR -o $CUSTOM_FNAME -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
-                        ;;
-                    y|Y|*)
-                        echo "Didnt change Name"
-                        $SET_ARIA2C -d $DIR -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
-read ok
-                        ;;
-                esac
-}
-#Function to Change Name
-change_name $FNAME
+            change_downloaded_file_name $FNAME
 
 
 #

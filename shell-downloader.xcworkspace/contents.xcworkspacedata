@@ -2,9 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:Downloader+functions.sh">
-   </FileRef>
-   <FileRef
       location = "group:Aria2 Downloader/Aria2 Downloader.xcodeproj">
    </FileRef>
    <FileRef
