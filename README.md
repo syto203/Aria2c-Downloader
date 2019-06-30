@@ -15,7 +15,7 @@ MiniDLNA manager
  ** To-Do **
 1-Running from current directory with aria2c in same path.
 2-Set the download and log to current path
-3-Pass options via cli
+✓ 3-Pass options via cli
 4-Pre-set download locations to choose from
 5-Search for aria2c and use it wherever it is.
 ✓   6-Remove all Mac only stuff from main selector

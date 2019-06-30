@@ -308,11 +308,11 @@ case $CHOICE in
 ################################### OS Selector #######################################
 #######################################################################################################
         printf "Choose your OS\n"
-        echo " "
-        printf "  Press 'O' for OpenWRT/Linux\n "
-        printf " Press 'i' for iOS\n "
-        printf " Press 'm' for Mac OS\n "
-        printf " Press 'z' to use Custom Download locations \n"
+        echo
+        printf "  Press \"O\" for OpenWRT/Linux\n "
+        printf " Press \"i\" for iOS\n "
+        printf " Press \"m\" for Mac OS\n "
+        printf " Press \"z\" to use Custom Download locations \n"
                 read -n 1 OS
                     case $OS in             # Start of OS Selector cases
 
