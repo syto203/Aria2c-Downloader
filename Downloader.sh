@@ -179,7 +179,6 @@ echo message    # any command
 ############################################################################
 ##############      End of Functions      ##################################
 ############################################################################
-
 ########### Setting Fixed Variables ###############
 SCRIPTNAME=$(basename $0)                         #
 SCRIPTPATH="${0%/*}"                              #
@@ -239,7 +238,6 @@ echo " "
 case $CHOICE in
         p|P)                # Memory Manager
                 clear
-#
                 echo "___  ___ ________  ________________   __";
                 echo "|  \/  ||  ___|  \/  |  _  | ___ \ \ / /";
                 echo "| .  . || |__ | .  . | | | | |_/ /\ V / ";
@@ -265,6 +263,7 @@ case $CHOICE in
                 printf "Press \"C\" For Combo Choice\n"
                 printf "Press \"F\" to Check Current Memory\n"
                 printf "Press \"P\" For Droping pagecache\n"
+                printf "Press \"Q\" For Droping pagecache\n"
                 read -n 1 INPUT
                     case $INPUT in
                             c|C)            # Combo Choice
@@ -293,7 +292,7 @@ case $CHOICE in
                                 printf "\nPurging...\n"
                                 echo 1 > /proc/sys/vm/drop_caches
                                 ;;
-                            *)
+                            q|Q|*)
                                 printf "\nExiting...\n"
                                 exit 1
                                 ;;
