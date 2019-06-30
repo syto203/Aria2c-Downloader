@@ -46,7 +46,6 @@ return 0
 #set download location
 set_download_location () {
 ## Prompt to changer Download Directory
-printf "\nKeep Download path as Default?  (default: /mnt/sda1/usb/video)\n (Y/N)?\n"
 read -n 1 C_DIR
     case $C_DIR in
         n|N)
@@ -90,16 +89,14 @@ case $1 in
         echo "The Following will now Run."
         echo "--****------****----****------****----****------****----****------****----****------****--"
         echo "Path+filename-˯     Threads     Max Conn.     Segment Size      Log Location          "
-        echo "aria2c "-d" "$DIR ""-o" "$CUSTOM_FNAME " -c "-s" "$THREADS" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
+        echo "aria2c "-d" "$DIR ""-o" "$CUSTOM_FNAME " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
         echo "--****------****----****------****----****------****----****------****----****------****--"
         echo "Press Enter to Continue"
-        read ok
-        $SET_ARIA2C -d $DIR -o $CUSTOM_FNAME -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+        $SET_ARIA2C -d $DIR -o $CUSTOM_FNAME -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
         ;;
     y|Y|*)
         echo "Didnt change Name"
-        $SET_ARIA2C -d $DIR -c -s $THREADS -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
-        read ok
+        $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
         ;;
 esac
 }
@@ -120,12 +117,68 @@ if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]             # Check if Binary Exists
 fi
 }
 
+set_threads(){
+printf "\nSet Download Threads No.:  "
+read THREADS
+}
+set_max_connections(){
+printf "\nSet Max Connections per Host (Max=16):"
+read MAX
+}
+set_segment_size(){
+printf "\nSet Download Download Segment Size.(default 1M):  "
+read SEG
+return 1
+}
+set_alloc(){
+printf "\nSet File Allocation Method  "
+printf "\nPossible Values: none, prealloc, trunc, falloc\n"
+printf "Default value= prealloc\n"
+printf "for the default vaule Press Enter/Return\n"
+read get_value
+case $get_value in
+none)
+    file_alloc=none
+    printf "\nYou Chose $file_alloc\n"
+read -t 1 ok
+    ;;
+trunc)
+    file_alloc=trunc
+    printf "\nYou Chose $file_alloc\n"
+read -t 1 ok
+    ;;
+falloc)
+    file_alloc=falloc
+    printf "\nYou Chose $file_alloc\n"
+read -t 1 ok
+    ;;
+prealloc|*)
+    file_alloc=prealloc
+    printf "\nYou Chose $file_alloc\n"
+read -t 1 ok
+    ;;
+esac
+}
 
+countdown()             #usage: countdown "00:00:05" #
+(
+IFS=:
+set -- $*
+secs=$(( ${1#0} * 3600 + ${2#0} * 60 + ${3#0} ))
+while [ $secs -gt 0 ]
+do
+sleep 1 &
+printf "\r%02d:%02d:%02d" $((secs/3600)) $(( (secs/60)%60)) $((secs%60))
+secs=$(( $secs - 1 ))
+wait
+done
+echo    #empty line
+echo message    # any command
+)
 
 ############################################################################
 ##############      End of Functions      ##################################
 ############################################################################
-
 
 ########### Setting Fixed Variables ###############
 SCRIPTNAME=$(basename $0)                         #
@@ -133,16 +186,37 @@ SCRIPTPATH="${0%/*}"                              #
 MAX=16                                            #
 THREADS=16                                        #
 SEG=1M                                            #
+file_alloc=prealloc
 ###################################################
 #   Ascii Art from (http://patorjk.com) #
 clear
+while getopts "a" OPTS; do      # parse CLI input
+    case $OPTS in
+        a )
+        set_threads
+        set_max_connections
+        set_segment_size
+        set_alloc
+        clear;
+        echo "   __    ____  _  _  __    _  _  ___  ____  ____  ";
+        echo "  /__\  (  _ \( \/ )/__\  ( \( )/ __)( ___)(  _ \ ";
+        echo " /(__)\  )(_) )\  //(__)\  )  (( (__  )__)  )(_) )";
+        echo "(__)(__)(____/  \/(__)(__)(_)\_)\___)(____)(____/ ";
+
+        ;;
+        * )
+        printf "\ninvalid input. did you mean -a\n"
+        exit 0;;
+    esac
+done
+shift $(($OPTIND - 1))
 echo "                 __         _______________  ________/\       ";
 echo "  _________.__._/  |_  ____ \_____  \   _  \ \_____  )/ ______";
 echo " /  ___<   |  |\   __\/  _ \ /  ____/  /_\  \  _(__  < /  ___/";
 echo " \___ \ \___  | |  | (  <_> )       \  \_/   \/       \\___ \ ";
 echo "/____  >/ ____| |__|  \____/\_______ \_____  /______  /____  >";
 echo "     \/ \/                          \/     \/       \/     \/ ";
-#
+sleep 1
 echo "      ________                      .__                    .___            ";
 echo "      \______ \   ______  _  ______ |  |   _________     __| _/___________ ";
 echo "       |    |  \ /  _ \ \/ \/ /    \|  |  /  _ \__  \   / __ |/ __ \_  __ \ ";
@@ -156,6 +230,7 @@ printf "Welcome\n"
 printf "Make Your Choice\n"
 printf " \"P\" to Open Memory Tool\n"
 printf " \"D\" to Open Aria2 Downloader\n"
+printf " \"A\" to Config Advanced Options\n"
 printf " \"M\" to Open MiniDLNA Service Manager\n"
 printf " \"Q\" to Exit\n"
 read -n 1 CHOICE
@@ -264,6 +339,7 @@ case $CHOICE in
                                 echo "Setting Work Directories"
                                 echo "Setting Download Directory"
                                 DIR=/mnt/sda1/usb/video
+                                printf "\nKeep Download path as Default?  (default: /mnt/sda1/usb/video)\n (Y/N)?\n"
                                 set_download_location
                                 printf "Setting Log Directory\n"
                                 set_log_location
@@ -297,6 +373,7 @@ case $CHOICE in
                                 echo "Setting Work Directories"
                                 echo "Setting Download Directory"
                                 DIR=/var/mobile/Downloads
+                                printf "\nKeep Download path as Default?  (default: /var/mobile/Downloads)\n (Y/N)?\n"
                                 set_download_location
                                 printf "Setting Log Directory\n"
                                 set_log_location
@@ -332,6 +409,8 @@ case $CHOICE in
                                 echo "Setting Working Directories"
                                 echo "Setting Download Directory"
                                 DIR=~/Downloads
+                                printf "\nKeep Download path as Default?  (default: ~/Downloads)\n (Y/N)?\n"
+
                                 set_download_location
                                 echo "Setting Log Directory"
                                 set_log_location
@@ -381,13 +460,7 @@ case $CHOICE in
 #########################################################################
 clear
 sleep 1
-#
-##########################################################################
-# *Extra Options* (comment out the fixed variables first)
-# read -p 'Threads =    (smaller or equal to max connections)' THREADS
-# read -p 'Max Connections=    (bigger or equal to max connections)' MAX
-# reap -p 'Segment Size=     ' SEG
-##########################################################################
+
             echo "*************************"
             echo "* Aria2 Auto-Downloader *"
             echo "*************************"
@@ -400,11 +473,6 @@ sleep 1
             echo "You Entered"
             echo $URL
             echo "##################################################################"
-            echo "The Following will now Run."
-            echo "--****------****----****------****----****------****----****------****----****------****--"
-            echo "        Path-˯     Threads     Max Conn.     Segment Size      Log Location          "
-            echo "aria2c "-d" "$DIR " -c -s "$THREADS" -x "$MAX" -k "$SEG" "$URL "> "$LOG" 2>&1 &"
-            echo "--****------****----****------****----****------****----****------****----****------****--"
             ### Change output filename ###
             printf "Keep Original Filename (Y/N)?\n"
             read -n 1 FNAME
@@ -542,6 +610,12 @@ read -n1 INPUT
 ############ End of MiniDLNA Service Manager ##############
 ###########################################################
         ;;         # End of Manage MiniDLNA Service Manager from script's starting Case.
+
+        a|A)                      # config extra options
+            echo " "
+            printf "Enabling Advanced Options. Restarting... \n"
+            sh /$SCRIPTPATH/$SCRIPTNAME -a
+            ;;
 
         *)                      # if you enter anything other than what's specified. Must be the last case
             echo " "
