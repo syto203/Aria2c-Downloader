@@ -197,7 +197,7 @@ read -n 1 OS
 case $OS in             # Start of OS Selector cases
 
 o|O)            # OpenWRT
-OS_LOGO=openwrt
+OS=openwrt
 printf "\nStarting..."
 clear
 OPENWRT_LOGO(){
@@ -236,7 +236,7 @@ sleep 1
 #read ok
 ;;
 i|I)            # iOS
-OS_LOGO=ios
+OS=ios
 printf "\nStarting..."
 clear
 IOS_LOGO(){
@@ -273,7 +273,7 @@ sleep 1
 #read ok
 ;;
 m|M)            # Mac OS
-OS_LOGO=mac
+OS=mac
 printf "\nStarting..."
 clear
 MAC_OS_LOGO(){
@@ -350,7 +350,7 @@ esac                # End of OS Selector cases
 #########################################################################
 clear
 sleep 1
-case $OS_LOGO in
+case $OS in
 openwrt)
 OPENWRT_LOGO
 ;;

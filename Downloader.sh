@@ -1,4 +1,5 @@
 #!/bin/bash
+# Created by syto203
 ###########################################################################
 # Dependancies
 # assuming you have a functioning storage
@@ -134,6 +135,33 @@ if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]             # Check if Binary Exists
     printf "A Binary was Found and it has Correct Permissions\n"
     else
         printf "aria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
+        printf "Want to attempt to install it? (Y/N)\n"
+        read -n 1 INSTALL_PROMPT
+            case $INSTALL_PROMPT in
+                y)
+                    case $OS in
+                        openwrt)
+                            sh /$RUNPATH/$MYSCRIPT -o
+                            ;;
+                        ios)
+                            printf "installing Aria2\n"
+                            TMP=$(mktemp -d)
+                            wget -e robots=off -r -nc -np -nd -nH --accept-regex=aria2 -R 'index.html' https://apt.bingner.com/debs/1443.00/ -P $TMP && echo Downloaded
+                            dpkg -i -R $TMP
+                            rm -r $TMP
+                            printf "\nDone\n"
+                            ;;
+                        mac)
+                            sh /$RUNPATH/$MYSCRIPT -u
+                            ;;
+                    esac
+                    ;;
+                n|*)
+                    printf "Exiting...\n"
+                    exit
+                    ;;
+            esac
+
         exit 11
 fi
 }
@@ -399,7 +427,7 @@ read -n 1 OS
     case $OS in             # Start of OS Selector cases
 
         o|O)            # OpenWRT
-            OS_LOGO=openwrt
+            OS=openwrt
             printf "\nStarting..."
             clear
             OPENWRT_LOGO(){
@@ -429,7 +457,7 @@ read -n 1 OS
             echo "Continuing..."
             ;;
         i|I)            # iOS
-            OS_LOGO=ios
+            OS=ios
             printf "\nStarting..."
             clear
             IOS_LOGO(){
@@ -457,7 +485,7 @@ read -n 1 OS
             echo "Continuing..."
             ;;
         m|M)            # Mac OS
-            OS_LOGO=mac
+            OS=mac
             printf "\nStarting..."
             clear
             MAC_OS_LOGO(){
@@ -490,7 +518,6 @@ read -n 1 OS
         z|Z)                                                    # Custom Inputs
             printf "\nStarting..."
             clear
-            #
             echo "_________                 __                      ";
             echo "\_   ___ \ __ __  _______/  |_  ____   _____      ";
             echo "/    \  \/|  |  \/  ___/\   __\/  _ \ /     \     ";
@@ -525,7 +552,7 @@ read -n 1 OS
     #########################################################################
     clear
     sleep 1
-    case $OS_LOGO in
+    case $OS in
         openwrt)
             OPENWRT_LOGO
             ;;
@@ -583,17 +610,18 @@ read -n 1 OS
 ##############      End of Functions      ##################################
 ############################################################################
 ########### Setting Fixed Variables ###############
-MYSCRIPT=$(basename $0)                         #
-RUNPATH="${0%/*}"                              #
+MYSCRIPT=$(basename $0)                           #
+RUNPATH="${0%/*}"                                 #
 MAX=16                                            #
 THREADS=16                                        #
 SEG=1M                                            #
 file_alloc=prealloc                               #
-#source RUNPATH/syto203.sh                     #
+#source RUNPATH/syto203.sh                        #
 ###################################################
 clear
 ##########################################################################
-while getopts "a A m M o O t T d D p P" OPTS; do      # parse CLI input
+# parse CLI input
+while getopts "auotdm" OPTS; do
     case $OPTS in
         a )
             set_threads
@@ -606,28 +634,28 @@ while getopts "a A m M o O t T d D p P" OPTS; do      # parse CLI input
             echo " /(__)\  )(_) )\  //(__)\  )  (( (__  )__)  )(_) )";
             echo "(__)(__)(____/  \/(__)(__)(_)\_)\___)(____)(____/ ";
             ;;
-        m )
+        u )
             printf "\ninstalling for Mac via homebrew\n"
             brew install aria2 && clear
             ;;
-        o|O )
+        o )
             printf "\ninstalling for OpenWRT\n"
             opkg update && opkg install aria2;
             clear
             ;;
-        t|T )
+        t )
             MEMORY_TOOL
             ;;
-        d|D )
+        d )
             DOWNLOADER_ARIA
            ;;
-        p|P )
+        m )
             MINIDLNA_MANAGER
            ;;
-#        b|B )
+#        b )
 #            DOWNLOADER_ARIA_TORRENT
 #            ;;
-#        h|H )
+#        h )
 #            echo usage
 #            echo
 #            ;;
