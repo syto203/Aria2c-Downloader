@@ -2,10 +2,15 @@
 A Shell Script Downloader using Aria2c on multiple platforms.
 
 
+requires Aria2 from
 
-Just use the Downloader.sh file
+https://aria2.github.io
+
+use the Downloader.sh.
+
 detailed usage coming soon
-CLI only Coming Soon (Maybe)
+
+~~CLI only Coming Soon (Maybe)~~
 
 for now the Script Contains Everything
 Memory manager
@@ -14,6 +19,7 @@ MiniDLNA manager
 
 
  ** To-Do **
+ 
  [   ]   1-Running from current directory with aria2c in same path.
  
  [   ]   2-Set the download and log to current path.

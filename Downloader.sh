@@ -26,7 +26,7 @@ if [ -d $1 ] && [ -w $1 ]
 fi
 }
 
-#Function to Make Missing Directory
+#Function to Create Missing Directory
 create_missing_directory () {
 printf "Would you like to Create it? (y/n)\n"             #create Missing Directory
 read -n 1 MK_DEFAULT_DIR
@@ -36,6 +36,7 @@ read -n 1 MK_DEFAULT_DIR
         exit 2
         ;;
     q|Q)
+        echo
         exit 0
         ;;
     y|Y|*)
@@ -199,6 +200,7 @@ set_alloc(){
 ##############      End of Functions      ##################################
 ############################################################################
 ######################### Modules ##########################################
+############################################################################
 
 MEMORY_TOOL(){
 clear
@@ -300,65 +302,74 @@ read -n 1 MANAGE
             printf "\nStarting MiniDLNA\n"
             /etc/init.d/minidlna start                # start minidlna service
             printf "Start Service Done\n"
+            exit
             ;;
         h|H)
             printf "\nStopping MiniDLNA\n"
             /etc/init.d/minidlna stop                # stop minidlna service
             printf "MiniDLNA Service Stopped\n"
+            exit
             ;;
         e|E)
             printf "\nEnable MiniDLNA\n"
             /etc/init.d/minidlna enable                # enable minidlna service
             printf "MiniDLNA Service Enabled\n"
+            exit
             ;;
         d|D)
             printf "\nDisable MiniDLNA\n"
             /etc/init.d/minidlna disable                # Disable minidlna service
             printf "MiniDLNA Service Disabled\n"
+            exit
             ;;
         l|L)
             printf "\nReload MiniDLNA\n"
             /etc/init.d/minidlna reload                # Reload minidlna service
             printf "MiniDLNA service Reloaded\n"
+            exit
             ;;
         r|R)                                           # Restart minidlna service
             printf "\nRestarting MiniDLNA\n"
             /etc/init.d/minidlna restart
             printf "Restart Finished\n"
+            exit
             ;;
         b|B)
             printf "\nIf your database is large it will take sometime to Populate\n"
             printf "Delete Databse file too? (Y/N)\n"
             read -n 1 DEL_DB1
                 case $DEL_DB1 in
-                    y|Y)
+                    n|N)
+                        echo "\ncool cool cool"
+                        ;;
+                    y|Y|*)
                         printf "\nAre You Sure? (Y/N)\n"
                         read -n1 DEL_DB2
                             case $DEL_DB2 in
                                 n|N)
                                     echo "\nDatabase File NOT deleted"
                                     ;;
-                                y|Y)
+                                y|Y|*)
                                     printf "\nLocating and Deleteing Database...\n"
+                                    # get the output of "UCI", awk to remove everything else except the path itself, store it in variable DB,
+                                    # use the variable to run the "rm" command or notify if the file was already deleted.
                                     uci show minidlna | awk -F"'" '/db_dir/{print $2}' | ( read DB; (rm $DB/files.db) && printf "Database Deleted\n" || printf " \nDatabase file is already Deleted\n")
-                                    printf "Restart the MiniDLNA service to re-make and Populate your Database\n"
+                                    printf "Restarting the MiniDLNA service to re-make and Populate your Database\n"
                                     ;;
                             esac     # End Inner case switch
                         ;;
-                    n|N)
-                        echo "\ncool cool cool"
-                        ;;
                     esac
+            exit
             ;; # end of b|B)
-                    q|Q)                        # Quit
-                        printf "\nExiting\n"
-                        exit
-                        ;;
-                    *)
-                        echo " "
-                        printf "You Didn't Choose. Exiting...\n"
-                        exit 10
-                        ;;
+        q|Q)                        # Quit
+            printf "\nExiting\n"
+            exit
+            ;;
+        *)
+            echo " "
+            printf "You Didn't Choose. Exiting...\n"
+            exit 10
+            ;;
     esac                        # Selector End
 ###########################################################
 ############ End of MiniDLNA Service Manager ##############
@@ -572,7 +583,7 @@ read -n 1 OS
 ##############      End of Functions      ##################################
 ############################################################################
 ########### Setting Fixed Variables ###############
-SCRIPT=$(basename $0)                         #
+MYSCRIPT=$(basename $0)                         #
 RUNPATH="${0%/*}"                              #
 MAX=16                                            #
 THREADS=16                                        #
@@ -615,6 +626,10 @@ while getopts "a A m M o O t T d D p P" OPTS; do      # parse CLI input
            ;;
 #        b|B )
 #            DOWNLOADER_ARIA_TORRENT
+#            ;;
+#        h|H )
+#            echo usage
+#            echo
 #            ;;
         * )
             printf "\ninvalid input. did you mean -a\n"
@@ -669,12 +684,12 @@ case $CHOICE in                 # Main Case Selector
         a|A)                      # config extra options
             echo " "
             printf "Enabling Advanced Options. Restarting... \n"
-            sh /$RUNPATH/$SCRIPT -a
+            sh /$RUNPATH/$MYSCRIPT -a
             ;;
 
         *)                      # if you enter anything other than what's specified. Must be the last case
             echo " "
             printf "You Didn't Choose. Restarting... \n"
-            sh /$RUNPATH/$SCRIPT
+            sh /$RUNPATH/$MYSCRIPT
             ;;
         esac
