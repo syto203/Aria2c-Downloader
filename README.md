@@ -13,9 +13,9 @@ detailed usage coming soon
 ~~CLI only Coming Soon (Maybe)~~
 
 for now the Script Contains Everything
-Memory manager
-Downloader
-MiniDLNA manager
+Memory manager (linux only)
+Downloader  (all platforms)
+MiniDLNA manager (linux)
 
 
  ** To-Do **
