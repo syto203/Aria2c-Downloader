@@ -5,9 +5,9 @@
 #
 #  Created by syto203 on 7/1/19.
 #  
-############################################################################
 ######################### Modules ##########################################
-source RUNPATH/syto203.sh
+############################################################################
+
 MEMORY_TOOL(){
 clear
 echo "___  ___ ________  ________________   __";
@@ -104,60 +104,68 @@ printf "Press ""Q"" to Quit MiniDLNA Service Manager\n"
 
 read -n 1 MANAGE
 case $MANAGE in             # Selector Start
-
 s|S)
 printf "\nStarting MiniDLNA\n"
 /etc/init.d/minidlna start                # start minidlna service
 printf "Start Service Done\n"
+exit
 ;;
 h|H)
 printf "\nStopping MiniDLNA\n"
 /etc/init.d/minidlna stop                # stop minidlna service
 printf "MiniDLNA Service Stopped\n"
+exit
 ;;
 e|E)
 printf "\nEnable MiniDLNA\n"
 /etc/init.d/minidlna enable                # enable minidlna service
 printf "MiniDLNA Service Enabled\n"
+exit
 ;;
 d|D)
 printf "\nDisable MiniDLNA\n"
 /etc/init.d/minidlna disable                # Disable minidlna service
 printf "MiniDLNA Service Disabled\n"
+exit
 ;;
 l|L)
 printf "\nReload MiniDLNA\n"
 /etc/init.d/minidlna reload                # Reload minidlna service
 printf "MiniDLNA service Reloaded\n"
+exit
 ;;
 r|R)                                           # Restart minidlna service
 printf "\nRestarting MiniDLNA\n"
 /etc/init.d/minidlna restart
 printf "Restart Finished\n"
+exit
 ;;
 b|B)
 printf "\nIf your database is large it will take sometime to Populate\n"
 printf "Delete Databse file too? (Y/N)\n"
 read -n 1 DEL_DB1
 case $DEL_DB1 in
-y|Y)
+n|N)
+echo "\ncool cool cool"
+;;
+y|Y|*)
 printf "\nAre You Sure? (Y/N)\n"
 read -n1 DEL_DB2
 case $DEL_DB2 in
 n|N)
 echo "\nDatabase File NOT deleted"
 ;;
-y|Y)
+y|Y|*)
 printf "\nLocating and Deleteing Database...\n"
+# get the output of "UCI", awk to remove everything else except the path itself, store it in variable DB,
+# use the variable to run the "rm" command or notify if the file was already deleted.
 uci show minidlna | awk -F"'" '/db_dir/{print $2}' | ( read DB; (rm $DB/files.db) && printf "Database Deleted\n" || printf " \nDatabase file is already Deleted\n")
-printf "Restart the MiniDLNA service to re-make and Populate your Database\n"
+printf "Restarting the MiniDLNA service to re-make and Populate your Database\n"
 ;;
 esac     # End Inner case switch
 ;;
-n|N)
-echo "\ncool cool cool"
-;;
 esac
+exit
 ;; # end of b|B)
 q|Q)                        # Quit
 printf "\nExiting\n"
@@ -212,14 +220,7 @@ echo "        |_|                                       ";
 }
 OPENWRT_LOGO
 SET_ARIA2C=/usr/bin/aria2c                        # Default for OpenWRT and iOS
-if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]                             # check binary existance and executable permissions.
-then
-printf "A Binary was Found and it has Correct Permissions\n"
-else
-printf "aria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
-printf "OR you Chose the Wrong OS\n"
-exit 1
-fi
+aria2c_check $SET_ARIA2C
 echo "Setting Work Directories"
 echo "Setting Download Directory"
 DIR=/mnt/sda1/usb/video
@@ -232,8 +233,6 @@ printf "Log Location: "$LOG"\n"
 touch /tmp/.aria2c
 CHECK1=/tmp/.aria2c
 echo "Continuing..."
-sleep 1
-#read ok
 ;;
 i|I)            # iOS
 OS=ios
@@ -251,14 +250,7 @@ echo "                      ";
 }
 IOS_LOGO
 SET_ARIA2C=/usr/bin/aria2c                        # Default for OpenWRT and iOS
-if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]                             # check binary existance and executable permissions.
-then
-printf "A Binary was Found and it has Correct Permissions\n"
-else
-printf "aria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
-printf "OR you Chose the Wrong OS\n"
-exit 1
-fi
+aria2c_check $SET_ARIA2C
 echo "Setting Work Directories"
 echo "Setting Download Directory"
 DIR=/var/mobile/Downloads
@@ -269,8 +261,6 @@ set_log_location
 printf "Download Loation: "$DIR"\n"
 printf "Log Location: "$LOG"\n"
 echo "Continuing..."
-sleep 1
-#read ok
 ;;
 m|M)            # Mac OS
 OS=mac
@@ -288,14 +278,7 @@ echo "                                      ";
 }
 MAC_OS_LOGO
 SET_ARIA2C=/usr/local/bin/aria2c                 # Default for MacOS via homebrew
-if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]         # check binary existance and executable permissions.
-then
-printf "A Binary was Found and it has Correct Permissions\n"
-else
-printf "aria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
-printf "OR you Chose the Wrong OS\n"
-exit 1
-fi
+aria2c_check $SET_ARIA2C
 echo "aria2c has correct permissions"
 echo "Setting Working Directories"
 echo "Setting Download Directory"
@@ -309,13 +292,10 @@ echo "Download Location= "$DIR""
 echo "Log Location= "$LOG""
 touch /tmp/.aria2c
 echo "Continuing..."
-sleep 1
-#read ok
 ;;
 z|Z)                                                    # Custom Inputs
 printf "\nStarting..."
 clear
-#
 echo "_________                 __                      ";
 echo "\_   ___ \ __ __  _______/  |_  ____   _____      ";
 echo "/    \  \/|  |  \/  ___/\   __\/  _ \ /     \     ";

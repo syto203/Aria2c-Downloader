@@ -21,7 +21,7 @@ create_missing_directory $1
 fi
 }
 
-#Function to Make Missing Directory
+#Function to Create Missing Directory
 create_missing_directory () {
 printf "Would you like to Create it? (y/n)\n"             #create Missing Directory
 read -n 1 MK_DEFAULT_DIR
@@ -29,6 +29,10 @@ case $MK_DEFAULT_DIR in
 n|N)
 printf "\nExiting...\n"
 exit 2
+;;
+q|Q)
+echo
+exit 0
 ;;
 y|Y|*)
 mkdir -p $1
@@ -47,6 +51,9 @@ n|N)
 echo ""
 read -p 'Enter Download Path:   ' DIR         # custom directory and check
 validate_download_directory $DIR              # check and create the directory if it doesnt exist.
+;;
+q|Q)
+exit 0
 ;;
 y|Y|*)
 printf "Keeping Default Download Path.\n"
@@ -67,6 +74,9 @@ read -p 'Enter Log Path:   ' LOG_LOCATION            # custom directory and chec
 validate_download_directory $LOG_LOCATION
 LOG=$LOG_LOCATION/aria2c.log
 ;;
+q|Q)
+exit 0
+;;
 y|Y|*)
 LOG_LOCATION=/tmp
 validate_download_directory $LOG_LOCATION
@@ -76,8 +86,11 @@ esac
 }
 
 #Function to Change Output Name
-change_downloaded_file_name (){
+download_http_final (){
 case $1 in
+q|Q)
+exit 0
+;;
 n|N)
 echo "Enter Filename: (Don't forget the Extension)"
 read CUSTOM_FNAME
@@ -87,10 +100,18 @@ echo "Path+filename-˯     Threads     Max Conn.     Segment Size      Log Locat
 echo "aria2c "-d" "$DIR ""-o" "$CUSTOM_FNAME " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
 echo "--****------****----****------****----****------****----****------****----****------****--"
 echo "Press Enter to Continue"
+read ok
 $SET_ARIA2C -d $DIR -o $CUSTOM_FNAME -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
 ;;
 y|Y|*)
-echo "Didnt change Name"
+printf "NOTICE!!!   Didn't change The File Name\n\n"
+echo "The Following will now Run."
+echo "--****------****----****------****----****------****----****------****----****------****--"
+echo "Path+filename-˯     Threads     Max Conn.     Segment Size      Log Location          "
+echo "aria2c "-d" "$DIR " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
+echo "--****------****----****------****----****------****----****------****----****------****--"
+echo "Press Enter to Continue"
+read ok
 $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
 ;;
 esac
@@ -108,6 +129,33 @@ fi
 printf "A Binary was Found and it has Correct Permissions\n"
 else
 printf "aria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
+printf "Want to attempt to install it? (Y/N)\n"
+read -n 1 INSTALL_PROMPT
+case $INSTALL_PROMPT in
+y)
+case $OS in
+openwrt)
+sh /$RUNPATH/$MYSCRIPT -o
+;;
+ios)
+printf "installing Aria2\n"
+TMP=$(mktemp -d)
+wget -e robots=off -r -nc -np -nd -nH --accept-regex=aria2 -R 'index.html' https://apt.bingner.com/debs/1443.00/ -P $TMP && echo Downloaded
+dpkg -i -R $TMP
+rm -r $TMP
+printf "\nDone\n"
+;;
+mac)
+sh /$RUNPATH/$MYSCRIPT -u
+;;
+esac
+;;
+n|*)
+printf "Exiting...\n"
+exit
+;;
+esac
+
 exit 11
 fi
 }
@@ -132,22 +180,22 @@ printf "Default value= prealloc\n"
 printf "for the default vaule Press Enter/Return\n"
 read get_value
 case $get_value in
-none)
+none )
 file_alloc=none
 printf "\nYou Chose $file_alloc\n"
 read -t 1 ok
 ;;
-trunc)
+trunc )
 file_alloc=trunc
 printf "\nYou Chose $file_alloc\n"
 read -t 1 ok
 ;;
-falloc)
+falloc )
 file_alloc=falloc
 printf "\nYou Chose $file_alloc\n"
 read -t 1 ok
 ;;
-prealloc|*)
+prealloc|* )
 file_alloc=prealloc
 printf "\nYou Chose $file_alloc\n"
 read -t 1 ok
@@ -161,16 +209,15 @@ IFS=:
 set -- $*
 secs=$(( ${1#0} * 3600 + ${2#0} * 60 + ${3#0} ))
 while [ $secs -gt 0 ]
-do
-sleep 1 &
-printf "\r%02d:%02d:%02d" $((secs/3600)) $(( (secs/60)%60)) $((secs%60))
-secs=$(( $secs - 1 ))
-wait
-done
+    do
+    sleep 1 &
+    printf "\r%02d:%02d:%02d" $((secs/3600)) $(( (secs/60)%60)) $((secs%60))
+    secs=$(( $secs - 1 ))
+    wait
+    done
 echo    #empty line
 echo message    # any command
 )
-
 ############################################################################
 ##############      End of Functions      ##################################
 ############################################################################
