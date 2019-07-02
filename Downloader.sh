@@ -84,7 +84,7 @@ read -n 1 C_LOG_LOCATION
         y|Y|*)
             LOG_LOCATION=/tmp
             validate_download_directory $LOG_LOCATION
-            LOG=$LOG_LOCATION/aria2c.log
+            LOG=$LOG_LOCATION/aria2c-"$(($RANDOM))".log
             ;;
     esac
 }
@@ -105,7 +105,7 @@ case $1 in
         echo "--****------****----****------****----****------****----****------****----****------****--"
         echo "Press Enter to Continue"
         read ok
-        $SET_ARIA2C -d $DIR -o $CUSTOM_FNAME -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+        $SET_ARIA2C -d $DIR -o "$CUSTOM_FNAME" -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
         ;;
     y|Y|*)
         printf "NOTICE!!!   Didn't change The File Name\n\n"

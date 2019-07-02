@@ -220,12 +220,14 @@ echo "        |_|                                       ";
 }
 OPENWRT_LOGO
 SET_ARIA2C=/usr/bin/aria2c                        # Default for OpenWRT and iOS
+local_aria2c        # use aria2c from local folder if found
 aria2c_check $SET_ARIA2C
 echo "Setting Work Directories"
 echo "Setting Download Directory"
 DIR=/mnt/sda1/usb/video
 printf "\nKeep Download path as Default?  (default: /mnt/sda1/usb/video)\n (Y/N)?\n"
 set_download_location
+validate_download_directory $DIR
 printf "Setting Log Directory\n"
 set_log_location
 printf "Download Loation: "$DIR"\n"
@@ -250,12 +252,14 @@ echo "                      ";
 }
 IOS_LOGO
 SET_ARIA2C=/usr/bin/aria2c                        # Default for OpenWRT and iOS
+local_aria2c        # use aria2c from local folder if found
 aria2c_check $SET_ARIA2C
 echo "Setting Work Directories"
 echo "Setting Download Directory"
 DIR=/var/mobile/Downloads
 printf "\nKeep Download path as Default?  (default: /var/mobile/Downloads)\n (Y/N)?\n"
 set_download_location
+validate_download_directory $DIR
 printf "Setting Log Directory\n"
 set_log_location
 printf "Download Loation: "$DIR"\n"
@@ -278,14 +282,15 @@ echo "                                      ";
 }
 MAC_OS_LOGO
 SET_ARIA2C=/usr/local/bin/aria2c                 # Default for MacOS via homebrew
+local_aria2c        # use aria2c from local folder if found
 aria2c_check $SET_ARIA2C
 echo "aria2c has correct permissions"
 echo "Setting Working Directories"
 echo "Setting Download Directory"
 DIR=~/Downloads
-printf "\nKeep Download path as Default?  (default: ~/Downloads)\n (Y/N)?\n"
-
+printf "\nKeep Download path as Default?  (default: /Users/<homefolder>/Downloads)\n (Y/N)?\n"
 set_download_location
+validate_download_directory $DIR
 echo "Setting Log Directory"
 set_log_location
 echo "Download Location= "$DIR""
@@ -309,7 +314,8 @@ echo "       |   |   |  \\___ \  |  |  / __ \|  |_|  |__";
 echo "       |___|___|  /____  > |__| (____  /____/____/";
 echo "                \/     \/            \/           ";
 #
-read -p "Aria2c's Binary Location (default= /usr/bin/aria2c):   " SET_ARIA2C
+read -p "Aria2c's Binary Location (Skip if locally):   " SET_ARIA2C
+local_aria2c        # use aria2c from local folder if found
 aria2c_check $SET_ARIA2C
 read -p 'Enter Download Path:   ' DIR                # custome directory and check
 validate_download_directory $DIR
@@ -383,3 +389,7 @@ esac
 ############ End of Aria2c Downloader Script#############
 #########################################################
 }           # End of DOWNLOADER_ARIA
+
+############################################################################
+##############      End of Modules      ##################################
+############################################################################
