@@ -151,14 +151,30 @@ if [[ -f $SET_ARIA2C ]] && [[ -x $SET_ARIA2C ]]             # Check if Binary Ex
                             sh /$RUNPATH/$MYSCRIPT -o
                             ;;
                         ios)
-                            printf "installing Aria2\n"
-                            TMP=$(mktemp -d)
-                            wget -e robots=off -r -nc -np -nd -nH --accept-regex=aria2 -R 'index.html' https://apt.bingner.com/debs/1443.00/ -P $TMP && echo Downloaded
-                            dpkg -i -R $TMP
-                            rm -r $TMP
-                            printf "\nDone\n"
+                            printf "You Need the package \"Aria2\" from: \n"
+                            printf "Sam Bingner's (https://apt.bingner.com) or Apollo's (https://mcapollo.github.io/Public) repo\n"
+                            printf "To Get the Most Up-To-Date Features\n"
+                            printf "However, I can try to manually install it\n"
+                            printf "Proceed ?\n"
+                                read InstallforI
+                                    case $InstallforI in
+                                        n|N )
+                                                exit
+                                                ;;
+                                        y|Y|*)
+                                                printf "installing Aria2\n"
+                                                TMP=$(mktemp -d)
+                                                wget -e robots=off -r -nc -np -nd -nH --accept-regex=aria2 -R 'index.html' https://apt.bingner.com/debs/1443.00/ -P $TMP && echo Downloaded
+                                                dpkg -i -R $TMP
+                                                rm -r $TMP
+                                                printf "\nDone\n"
+                                                ;;
+                                    esac
                             ;;
                         mac)
+                            printf "You Need to have Homebrew installed"
+                            printf "You can get it from \"http://brew.sh\""
+                            printf "Attempting..."
                             sh /$RUNPATH/$MYSCRIPT -u
                             ;;
                     esac
