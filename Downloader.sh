@@ -15,9 +15,9 @@
 ##############       Functions      ########################################
 ############################################################################
 
-# check if directory exits and writeable
+# check and create the directory if it doesnt exist
 validate_download_directory () {
-if [ -d $1 ] && [ -w $1 ]
+if [[ -d $1 ]] && [[ -w $1 ]]
     then
         printf "Directory was Found and Writable\n\n"
     else
@@ -56,14 +56,12 @@ read -n 1 C_DIR
         n|N)
             echo ""
             read -p 'Enter Download Path:   ' DIR         # custom directory and check
-            validate_download_directory $DIR              # check and create the directory if it doesnt exist.
             ;;
         q|Q)
             exit 0
             ;;
         y|Y|*)
             printf "Keeping Default Download Path.\n"
-            validate_download_directory $DIR
             ;;
 esac
 }
@@ -123,8 +121,17 @@ case $1 in
 esac
 }
 
+local_aria2c() # use aria2c from local folder if found
+{
+local local_aria=$RUNPATH/aria2c
+if [[ -f $local_aria ]] && [[ -x $local_aria ]]
+    then
+        SET_ARIA2C=$local_aria
+fi
+}
+
 aria2c_check () {
-if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]             # Check if Binary Exists and Executable
+if [[ -f $SET_ARIA2C ]] && [[ -x $SET_ARIA2C ]]             # Check if Binary Exists and Executable
     then
         if  [ -d $SET_ARIA2C ]      #check if only the directory was entered.
             then
@@ -134,7 +141,7 @@ if [ -f $SET_ARIA2C ] && [ -x $SET_ARIA2C ]             # Check if Binary Exists
         fi
     printf "A Binary was Found and it has Correct Permissions\n"
     else
-        printf "aria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
+        printf "\naria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
         printf "Want to attempt to install it? (Y/N)\n"
         read -n 1 INSTALL_PROMPT
             case $INSTALL_PROMPT in
@@ -442,12 +449,14 @@ read -n 1 OS
             }
             OPENWRT_LOGO
             SET_ARIA2C=/usr/bin/aria2c                        # Default for OpenWRT and iOS
+            local_aria2c        # use aria2c from local folder if found
             aria2c_check $SET_ARIA2C
             echo "Setting Work Directories"
             echo "Setting Download Directory"
             DIR=/mnt/sda1/usb/video
             printf "\nKeep Download path as Default?  (default: /mnt/sda1/usb/video)\n (Y/N)?\n"
             set_download_location
+            validate_download_directory $DIR
             printf "Setting Log Directory\n"
             set_log_location
             printf "Download Loation: "$DIR"\n"
@@ -472,12 +481,14 @@ read -n 1 OS
             }
             IOS_LOGO
             SET_ARIA2C=/usr/bin/aria2c                        # Default for OpenWRT and iOS
+            local_aria2c        # use aria2c from local folder if found
             aria2c_check $SET_ARIA2C
             echo "Setting Work Directories"
             echo "Setting Download Directory"
             DIR=/var/mobile/Downloads
             printf "\nKeep Download path as Default?  (default: /var/mobile/Downloads)\n (Y/N)?\n"
             set_download_location
+            validate_download_directory $DIR
             printf "Setting Log Directory\n"
             set_log_location
             printf "Download Loation: "$DIR"\n"
@@ -500,14 +511,15 @@ read -n 1 OS
             }
             MAC_OS_LOGO
             SET_ARIA2C=/usr/local/bin/aria2c                 # Default for MacOS via homebrew
+            local_aria2c        # use aria2c from local folder if found
             aria2c_check $SET_ARIA2C
             echo "aria2c has correct permissions"
             echo "Setting Working Directories"
             echo "Setting Download Directory"
             DIR=~/Downloads
-            printf "\nKeep Download path as Default?  (default: ~/Downloads)\n (Y/N)?\n"
-
+            printf "\nKeep Download path as Default?  (default: /Users/<homefolder>/Downloads)\n (Y/N)?\n"
             set_download_location
+            validate_download_directory $DIR
             echo "Setting Log Directory"
             set_log_location
             echo "Download Location= "$DIR""
@@ -531,7 +543,8 @@ read -n 1 OS
             echo "       |___|___|  /____  > |__| (____  /____/____/";
             echo "                \/     \/            \/           ";
             #
-            read -p "Aria2c's Binary Location (default= /usr/bin/aria2c):   " SET_ARIA2C
+            read -p "Aria2c's Binary Location (Skip if locally):   " SET_ARIA2C
+            local_aria2c        # use aria2c from local folder if found
             aria2c_check $SET_ARIA2C
             read -p 'Enter Download Path:   ' DIR                # custome directory and check
             validate_download_directory $DIR
