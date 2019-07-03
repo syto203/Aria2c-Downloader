@@ -183,7 +183,7 @@ auto_install_aria2(){
                     sh /$RUNPATH/$MYSCRIPT -u
                     exit
                     ;;
-                    printf "\nExiting...\n";exit;;
+                    *) printf "\nExiting...\n";exit;;
         esac
 
 }
