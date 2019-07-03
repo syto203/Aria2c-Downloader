@@ -137,52 +137,55 @@ if [[ -f $SET_ARIA2C ]] && [[ -x $SET_ARIA2C ]]             # Check if Binary Ex
         fi
     printf "A Binary was Found and it has Correct Permissions\n"
     else
-        printf "\naria2c WAS NOT found or DOES NOT have correct permissions\nExiting...\n"
+        printf "\naria2c WAS NOT found or DOES NOT have correct Permissions\nExiting...\n"
         printf "Want to attempt to install it? (Y/N)\n"
         read -n 1 INSTALL_PROMPT
             case $INSTALL_PROMPT in
-                y)
-                    case $OS in
-                        openwrt)
-                            sh /$RUNPATH/$MYSCRIPT -o
-                            ;;
-                        ios)
-                            printf "You Need the package \"Aria2\" from: \n"
-                            printf "Sam Bingner's (https://apt.bingner.com) or Apollo's (https://mcapollo.github.io/Public) repo\n"
-                            printf "To Get the Most Up-To-Date Features\n"
-                            printf "However, I can try to manually install it\n"
-                            printf "Proceed ?\n"
-                                read InstallforI
-                                    case $InstallforI in
-                                        n|N )
-                                                exit
-                                                ;;
-                                        y|Y|*)
-                                                printf "installing Aria2\n"
-                                                TMP=$(mktemp -d)
-                                                wget -e robots=off -r -nc -np -nd -nH --accept-regex=aria2 -R 'index.html' https://apt.bingner.com/debs/1443.00/ -P $TMP && echo Downloaded
-                                                dpkg -i -R $TMP
-                                                rm -r $TMP
-                                                printf "\nDone\n"
-                                                ;;
-                                    esac
-                            ;;
-                        mac)
-                            printf "You Need to have Homebrew installed"
-                            printf "You can get it from \"http://brew.sh\""
-                            printf "Attempting..."
-                            sh /$RUNPATH/$MYSCRIPT -u
-                            ;;
-                    esac
+                y)      printf "\nWhat is your OS\n"
+                        read ARIA2_OS
+                        auto_install_aria2 $ARIA2_OS;;
+                n|*)    printf "\nExiting...\n";exit;;
+                esac
+fi
+}
+
+auto_install_aria2(){
+        case $ARIA2_OS in
+                openwrt)
+                    sh /$RUNPATH/$MYSCRIPT -o
                     ;;
-                n|*)
-                    printf "Exiting...\n"
+                ios)
+                    printf "\nYou Need the package \"Aria2\" from: \n"
+                    printf "Sam Bingner's (https://apt.bingner.com) or Apollo's (https://mcapollo.github.io/Public) repo\n"
+                    printf "To Get the Most Up-To-Date Features\n"
+                    printf "However, I can try to manually install it\n"
+                    printf "Proceed ?\n"
+                        read InstallforI
+                            case $InstallforI in
+                                n|N )
+                                        exit
+                                        ;;
+                                y|Y|*)
+                                        printf "installing Aria2\n"
+                                        TMP=$(mktemp -d)
+                                        wget -e robots=off -r -nc -np -nd -nH --accept-regex=aria2 -R 'index.html' https://apt.bingner.com/debs/1443.00/ -P $TMP && echo Downloaded
+                                        dpkg -i -R $TMP
+                                        rm -r $TMP
+                                        printf "\nDone\n"
+                                        exit
+                                        ;;
+                            esac
+                    ;;
+                mac|"mac os")
+                    printf "\nYou Need to have Homebrew installed"
+                    printf "You can get it from \"http://brew.sh\""
+                    printf "Attempting..."
+                    sh /$RUNPATH/$MYSCRIPT -u
                     exit
                     ;;
-            esac
+                    printf "\nExiting...\n";exit;;
+        esac
 
-        exit 11
-fi
 }
 
 set_threads(){
@@ -442,12 +445,11 @@ printf "  Press \"O\" for OpenWRT/Linux\n "
 printf " Press \"i\" for iOS\n "
 printf " Press \"m\" for Mac OS\n "
 printf " Press \"z\" to use Custom Download locations (ADVANCED)\n"
-read -n 1 OS
-    case $OS in             # Start of OS Selector cases
+read -n 1 OS_Main
+    case $OS_Main in             # Start of OS Selector cases
 
         o|O)            # OpenWRT
-            OS=openwrt
-            printf "\nStarting..."
+            ARIA2_OS=openwrt
             clear
             OPENWRT_LOGO(){
             echo "   ____               __          _______ _______ ";
@@ -477,8 +479,7 @@ read -n 1 OS
             echo "Continuing..."
             ;;
         i|I)            # iOS
-            OS=ios
-            printf "\nStarting..."
+            ARIA2_OS=ios
             clear
             IOS_LOGO(){
             echo "  _    ____     _____ ";
@@ -506,8 +507,7 @@ read -n 1 OS
             echo "Continuing..."
             ;;
         m|M)            # Mac OS
-            OS=mac
-            printf "\nStarting..."
+            ARIA2_OS=mac
             clear
             MAC_OS_LOGO(){
             echo "  __  __                 ____   _____ ";
