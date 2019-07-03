@@ -636,7 +636,7 @@ RUNPATH="${0%/*}"                                 #
 MAX=16                                            #
 THREADS=16                                        #
 SEG=1M                                            #
-file_alloc=prealloc                               #
+file_alloc=none                                   #
 #source RUNPATH/syto203.sh                        #
 ###################################################
 clear
