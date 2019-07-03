@@ -49,27 +49,23 @@ return 0
 }
 
 #set download location
-set_download_location () {
-## Prompt to changer Download Directory
-read -n 1 C_DIR
-    case $C_DIR in
-        n|N)
-            echo ""
-            read -p 'Enter Download Path:   ' DIR         # custom directory and check
-            ;;
-        q|Q)
-            exit 0
-            ;;
-        y|Y|*)
-            printf "Keeping Default Download Path.\n"
-            ;;
+set_download_location(){
+printf "\n 1) Local\n"
+printf " 2) Default\n"
+printf " 3) Other\n"
+read -n 1 D_PATH
+    case $D_PATH in
+    1)  DIR=$RUNPATH
+        printf " \nThe Download Path is set to your current Directory\n";;
+    2)  printf " \nThe Downloader's Path is \"$DIR\"\n";;
+    3)  printf " \nDon't Use \"~\" in your Path\n"
+        read -p 'Enter Download Path:   ' DIR;;
 esac
 }
 
 #set aria's log location
 set_log_location () {
-printf "Keep Log Location as Default? (Y/N)?\n"
-printf "Default: /tmp \n"
+printf "Keep Log Location as Default? (Y/N)?    (default: /tmp)\n"
 read -n 1 C_LOG_LOCATION
     case $C_LOG_LOCATION in
         n|N)
@@ -90,7 +86,7 @@ read -n 1 C_LOG_LOCATION
 }
 
 #Function to Change Output Name
-download_http_final (){
+download_http_final(){
 case $1 in
     q|Q)
         exit 0
@@ -121,7 +117,7 @@ case $1 in
 esac
 }
 
-local_aria2c() # use aria2c from local folder if found
+local_aria2c() # use aria2c from current folder if found
 {
 local local_aria=$RUNPATH/aria2c
 if [[ -f $local_aria ]] && [[ -x $local_aria ]]
@@ -470,7 +466,6 @@ read -n 1 OS
             echo "Setting Work Directories"
             echo "Setting Download Directory"
             DIR=/mnt/sda1/usb/video
-            printf "\nKeep Download path as Default?  (default: /mnt/sda1/usb/video)\n (Y/N)?\n"
             set_download_location
             validate_download_directory $DIR
             printf "Setting Log Directory\n"
@@ -502,7 +497,6 @@ read -n 1 OS
             echo "Setting Work Directories"
             echo "Setting Download Directory"
             DIR=/var/mobile/Downloads
-            printf "\nKeep Download path as Default?  (default: /var/mobile/Downloads)\n (Y/N)?\n"
             set_download_location
             validate_download_directory $DIR
             printf "Setting Log Directory\n"
@@ -533,7 +527,6 @@ read -n 1 OS
             echo "Setting Working Directories"
             echo "Setting Download Directory"
             DIR=~/Downloads
-            printf "\nKeep Download path as Default?  (default: /Users/<homefolder>/Downloads)\n (Y/N)?\n"
             set_download_location
             validate_download_directory $DIR
             echo "Setting Log Directory"
@@ -544,7 +537,6 @@ read -n 1 OS
             echo "Continuing..."
             ;;
         z|Z)                                                    # Custom Inputs
-            printf "\nStarting..."
             clear
             echo "_________                 __                      ";
             echo "\_   ___ \ __ __  _______/  |_  ____   _____      ";
@@ -670,7 +662,7 @@ while getopts "auotdm" OPTS; do
         o )
             printf "\ninstalling for OpenWRT\n"
             opkg update && opkg install aria2;
-            clear
+            exit
             ;;
         t )
             MEMORY_TOOL
