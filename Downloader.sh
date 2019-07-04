@@ -96,23 +96,21 @@ case $1 in
         read CUSTOM_FNAME
         echo "The Following will now Run."
         echo "--****------****----****------****----****------****----****------****----****------****--"
-        echo "Path+filename-˯     Threads     Max Conn.     Segment Size      Log Location          "
-        echo "aria2c "-d" "$DIR ""-o" "$CUSTOM_FNAME " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
+        echo "aria2c "-d" "$DIR ""-o" "$CUSTOM_FNAME " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$ADV" "$URL "> "$LOG" 2>&1 &"
         echo "--****------****----****------****----****------****----****------****----****------****--"
         echo "Press Enter to Continue"
         read ok
-        $SET_ARIA2C -d $DIR -o "$CUSTOM_FNAME" -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+        $SET_ARIA2C -d $DIR -o "$CUSTOM_FNAME" -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
         ;;
     y|Y|*)
         printf "NOTICE!!!   Didn't change The File Name\n\n"
         echo "The Following will now Run."
         echo "--****------****----****------****----****------****----****------****----****------****--"
-        echo "Path+filename-˯     Threads     Max Conn.     Segment Size      Log Location          "
-        echo "aria2c "-d" "$DIR " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
+        echo "aria2c "-d" "$DIR " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$ADV" "$URL "> "$LOG" 2>&1 &"
         echo "--****------****----****------****----****------****----****------****----****------****--"
         echo "Press Enter to Continue"
         read ok
-        $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+        $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
         ;;
 esac
 }
@@ -200,6 +198,10 @@ set_segment_size(){
     printf "\nSet Download Download Segment Size.(default 1M):  "
     read SEG
 return 1
+}
+adv_para(){
+printf "\nSet Advanced Parameters:  \n"
+read ADV
 }
 set_alloc(){
     printf "\nSet File Allocation Method  "
@@ -637,12 +639,13 @@ MAX=16                                            #
 THREADS=16                                        #
 SEG=1M                                            #
 file_alloc=none                                   #
+ADV=                                              #
 #source RUNPATH/syto203.sh                        #
 ###################################################
 clear
 ##########################################################################
 # parse CLI input
-while getopts "auotdm" OPTS; do
+while getopts "auotdmj" OPTS; do
     case $OPTS in
         a )
             set_threads
@@ -673,6 +676,8 @@ while getopts "auotdm" OPTS; do
         m )
             MINIDLNA_MANAGER
            ;;
+        j )
+            adv_para;;
 #        b )
 #            DOWNLOADER_ARIA_TORRENT
 #            ;;
