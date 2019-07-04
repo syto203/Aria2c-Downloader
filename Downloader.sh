@@ -540,6 +540,8 @@ read -n 1 OS_Main
             ;;
         z|Z)                                                    # Custom Inputs
             clear
+            ARIA2_OS=cust
+            CUST_OS_LOGO(){
             echo "_________                 __                      ";
             echo "\_   ___ \ __ __  _______/  |_  ____   _____      ";
             echo "/    \  \/|  |  \/  ___/\   __\/  _ \ /     \     ";
@@ -552,7 +554,8 @@ read -n 1 OS_Main
             echo "       |   |   |  \\___ \  |  |  / __ \|  |_|  |__";
             echo "       |___|___|  /____  > |__| (____  /____/____/";
             echo "                \/     \/            \/           ";
-            #
+            }
+            CUST_OS_LOGO
             read -p "Aria2c's Binary Location (Skip if locally):   " SET_ARIA2C
             local_aria2c        # use aria2c from local folder if found
             aria2c_check $SET_ARIA2C
@@ -575,16 +578,11 @@ read -n 1 OS_Main
     #########################################################################
     clear
     sleep 1
-    case $OS in
-        openwrt)
-            OPENWRT_LOGO
-            ;;
-        ios)
-            IOS_LOGO
-            ;;
-        mac)
-            MAC_OS_LOGO
-            ;;
+    case $ARIA2_OS in
+        openwrt)    OPENWRT_LOGO;;
+        ios)        IOS_LOGO;;
+        mac)        MAC_OS_LOGO;;
+        cust)       CUST_OS_LOGO;;
     esac
     echo
     echo "*************************"
