@@ -57,9 +57,9 @@ read -n 1 D_PATH
     case $D_PATH in
     1)  DIR=$RUNPATH
         printf " \nThe Download Path is set to your current Directory\n";;
-    2)  printf " \nThe Downloader's Path is \"$DIR\"\n";;
     3)  printf " \nDon't Use \"~\" in your Path\n"
         read -p 'Enter Download Path:   ' DIR;;
+    2|*)  printf " \nThe Downloader's Path is \"$DIR\"\n";;
 esac
 }
 
@@ -100,17 +100,17 @@ case $1 in
         echo "--****------****----****------****----****------****----****------****----****------****--"
         echo "Press Enter to Continue"
         read ok
-        $SET_ARIA2C -d $DIR -o "$CUSTOM_FNAME" -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
+        $SET_ARIA2C -d $DIR -o "$CUSTOM_FNAME" -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
         ;;
     y|Y|*)
         printf "NOTICE!!!   Didn't change The File Name\n\n"
         echo "The Following will now Run."
         echo "--****------****----****------****----****------****----****------****----****------****--"
-        echo "aria2c "-d" "$DIR " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$ADV" "$URL "> "$LOG" 2>&1 &"
+        echo "aria2c "-d" "$DIR " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
         echo "--****------****----****------****----****------****----****------****----****------****--"
         echo "Press Enter to Continue"
         read ok
-        $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
+        $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
         ;;
 esac
 }
@@ -637,7 +637,7 @@ MAX=16                                            #
 THREADS=16                                        #
 SEG=1M                                            #
 file_alloc=none                                   #
-ADV=                                              #
+ADV="-j 1"                                        #
 #source RUNPATH/syto203.sh                        #
 ###################################################
 clear
