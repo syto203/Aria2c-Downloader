@@ -8,6 +8,9 @@
       location = "group:/Users/samahy/Documents/XCode/Aria2c-Downloader/Downloader.sh">
    </FileRef>
    <FileRef
+      location = "group:/Users/samahy/Documents/XCode/Aria2c-Downloader/openwrt-only.sh">
+   </FileRef>
+   <FileRef
       location = "group:README.md">
    </FileRef>
 </Workspace>
