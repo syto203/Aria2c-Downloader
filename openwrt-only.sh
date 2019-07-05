@@ -358,6 +358,7 @@ case $1 in             # Start of OS Selector cases
         printf "Download Loation: "$DIR"\n"
         printf "Log Location: "$LOG"\n"
         echo "Continuing..."
+        DOWNLOADER_ARIA2
         ;;
     z|Z)                                                    # Custom Inputs
         clear
@@ -387,7 +388,7 @@ case $1 in             # Start of OS Selector cases
         printf "Download Loation: "$DIR"\n"
         printf "Log Location: "$LOG"\n"
         echo "Continuing..."
-        sleep 1
+        DOWNLOADER_ARIA2
         ;;      #custom install case
         *)
         printf "\nYou Didn't Choose. Exiting...\n"
