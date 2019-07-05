@@ -126,19 +126,17 @@ if [[ -f $SET_ARIA2C ]] && [[ -x $SET_ARIA2C ]]             # Check if Binary Ex
         printf "Want to attempt to install it? (Y/N)\n"
         read -n 1 INSTALL_PROMPT
             case $INSTALL_PROMPT in
-                y)      printf "\nWhat is your OS\n Enter one of the following\n"
-                        printf "openwrt , ios , mac , win64 , win32 , android\n"
-                        read ARIA2_OS
-                        auto_install_aria2 $ARIA2_OS;;
+                y)  auto_install_aria2 $ARIA2_OS;;
                 n|*)    printf "\nExiting...\n";exit;;
                 esac
 fi
 }                   # check if the chosen aria2 is correct and install if it isn't
 auto_install_aria2(){
-        case $ARIA2_OS in
+        case $1 in
                 openwrt)
-                    sh /$RUNPATH/$MYSCRIPT -o
-                    ;;
+                        printf "\ninstalling for OpenWRT\n"
+                        opkg update && opkg install aria2;
+                        exit;;
                 ios)
                     printf "\nYou Need the package \"Aria2\" from: \n"
                     printf "Sam Bingner's (https://apt.bingner.com) or Apollo's (https://mcapollo.github.io/Public) repo\n"
@@ -159,30 +157,40 @@ auto_install_aria2(){
                                         exit;;
                             esac
                     ;;
-                mac|"mac os")
+                mac)
                     printf "\nYou Need to have Homebrew installed\n"
                     printf "\n 1) Homebrew is already installed, Install Aria2 Now \n 2) Install Homebrew, then Aria2\n Q) to Quit\n"
                         read -n 1 STEP
                             case $STEP in
                                 1)  printf "Installing..."
-                                    sh /$RUNPATH/$MYSCRIPT -u;exit;;
+                                    printf "\ninstalling for Mac via homebrew\n"
+                                    brew install aria2 && clear;exit;;
                                 2)  (/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)")&&(sh /$RUNPATH/$MYSCRIPT -u);exit;;
                                 q|*) exit;;
                             esac
                     ;;
                 win64)
+                    printf "\nInstalling Aria2 for 64-bit Windows\n"
+                    printf "\nPress Enter to Continue\n"
+                    read ok
                     TMP=$(mktemp -d)
                     wget -e robots=off -r -nc -np -nd -nH --accept-regex=64bit -R 'latest' https://github.com/aria2/aria2/releases/latest -P $TMP && echo Downloaded
                     unzip $TMP/aria2*
                      mv $TMP/aria2*/aria2c.exe $RUNPATH
                     rm -r $TMP;;
                 win32)
+                    printf "\nInstalling Aria2 for 32-bit Windows\n"
+                    printf "\nPress Enter to Continue\n"
+                    read ok
                     TMP=$(mktemp -d)
                     wget -e robots=off -r -nc -np -nd -nH --accept-regex=32bit -R 'latest' https://github.com/aria2/aria2/releases/latest -P $TMP && echo Downloaded
                     unzip $TMP/aria2*
                     mv $TMP/aria2*/aria2c.exe $RUNPATH
                     rm -r $TMP;;
                 android)
+                    printf "\nInstalling Aria2 for Android\n"
+                    printf "\nPress Enter to Continue\n"
+                    read ok
                     TMP=$(mktemp -d)
                     wget -e robots=off -r -nc -np -nd -nH --accept-regex=android -R 'latest' https://github.com/aria2/aria2/releases/latest -P $TMP && echo Downloaded
                     unzip $TMP/aria2*
@@ -230,7 +238,22 @@ adv_para(){
 printf "\nSet Advanced Parameters:  \n"
 read ADV
 }                         # Enter Advanced parameters for Aria2
-
+usage_adv(){
+printf "\n\nYou Can either Run the script itself interactivly or via CLI\n"
+echo $MYSCRIPT [option]
+printf "\n\nOptions:\n"
+echo "----------"
+printf "\n -a       for advanced options. you can set thread count, max connections per host, segment size and file allocation method\n"
+printf " -h         Shows this Usage Info\n"
+printf " -u         Install Aria2 for MacOS\n"
+printf " -i         Install Aria2 for iOS\n"
+printf " -o         Install Aria2 for OpenWRT\n"
+printf " -w         Install Aria2 for 64-bit Windows\n"
+printf " -x         Install Aria2 for 64-bit Windows\n"
+printf " -r         Install Aria2 for Android\n"
+printf " -d         Jump to OS Selector\n"
+printf " -j         for passing more Aria2 paramters (ex. -j 1)\n\n"
+}                        # Show usage info
 #countdown()             #usage: countdown "00:00:05" #
 #(
 #IFS=:
@@ -247,7 +270,7 @@ read ADV
 #echo message    # any command
 #)
 ############################################################################
-DOWNLOADER_ARIA(){
+DOWNLOADER_ARIA2(){
 clear
 echo "Opening Downloader"
 clear
@@ -442,7 +465,7 @@ read -n 1 OS_Main
 #########################################################
 ############ End of Aria2c Downloader Script#############
 #########################################################
-# End of DOWNLOADER_ARIA
+# End of DOWNLOADER_ARIA2
 }       # Main Downloader script with OS Selector
 ############################################################################
 ########### Setting Fixed Variables ###############
@@ -458,7 +481,7 @@ ADV="-j 1"                                        #
 clear
 ##########################################################################
 # parse CLI input
-while getopts "auodj" OPTS; do
+while getopts "auoidjwxrh" OPTS; do
     case $OPTS in
         a)
             set_threads
@@ -471,31 +494,17 @@ while getopts "auodj" OPTS; do
             echo " /(__)\  )(_) )\  //(__)\  )  (( (__  )__)  )(_) )";
             echo "(__)(__)(____/  \/(__)(__)(_)\_)\___)(____)(____/ ";
             ;;
-        u)
-            printf "\ninstalling for Mac via homebrew\n"
-            brew install aria2 && clear
-            ;;
-        o)
-            printf "\ninstalling for OpenWRT\n"
-            opkg update && opkg install aria2;
-            exit
-            ;;
-        d)
-            DOWNLOADER_ARIA
-           ;;
-        j)
-            adv_para;;
-#        b )
-#            DOWNLOADER_ARIA_TORRENT
-#            ;;
-#        h )
-#            echo usage
-#            echo
-#            ;;
-        *)
-            printf "\ninvalid input. did you mean -a\n"
-            exit 0
-            ;;
+        u)  auto_install_aria2 mac;;
+        o)  auto_install_aria2 openwrt;;
+        i)  auto_install_aria2 ios;;
+        d)  DOWNLOADER_ARIA2;;
+        j)  adv_para;;
+        w) auto_install_aria2 win64;;
+        x) auto_install_aria2 win32;;
+        r) auto_install_aria2 android;;
+#        b) DOWNLOADER_ARIA2_TORRENT;;
+        *|h)  usage_adv
+            exit 0;;
     esac
 done
 shift $(($OPTIND - 1))              # End of CLI Parser
@@ -525,7 +534,7 @@ echo " "
 
 case $CHOICE in                 # Main Case Selector
         d|D)            ################## Aria2c Downloader ####################
-            DOWNLOADER_ARIA     # Call out to DOWNLOADER_ARIA for use in Main Case Selector (should really find a better name)
+            DOWNLOADER_ARIA2     # calls out to DOWNLOADER_ARIA2 for use in Main Case Selector (should really find a better name)
             ;;              # End Of Main Case Selector Choice
 
 
