@@ -100,17 +100,17 @@ case $1 in
         echo "--****------****----****------****----****------****----****------****----****------****--"
         echo "Press Enter to Continue"
         read ok
-        $SET_ARIA2C -d $DIR -o "$CUSTOM_FNAME" -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+        $SET_ARIA2C -d $DIR -o "$CUSTOM_FNAME" -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
         ;;
     y|Y|*)
         printf "NOTICE!!!   Didn't change The File Name\n\n"
         echo "The Following will now Run."
         echo "--****------****----****------****----****------****----****------****----****------****--"
-        echo "aria2c "-d" "$DIR " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$URL "> "$LOG" 2>&1 &"
+        echo "aria2c "-d" "$DIR " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$ADV" "$URL "> "$LOG" 2>&1 &"
         echo "--****------****----****------****----****------****----****------****----****------****--"
         echo "Press Enter to Continue"
         read ok
-        $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$URL" > $LOG 2>&1 &
+        $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
         ;;
 esac
 }
@@ -139,7 +139,8 @@ if [[ -f $SET_ARIA2C ]] && [[ -x $SET_ARIA2C ]]             # Check if Binary Ex
         printf "Want to attempt to install it? (Y/N)\n"
         read -n 1 INSTALL_PROMPT
             case $INSTALL_PROMPT in
-                y)      printf "\nWhat is your OS\n"
+                y)      printf "\nWhat is your OS\n Enter one of the following\n"
+                        printf "openwrt , ios , mac , win64 , win32 , android\n"
                         read ARIA2_OS
                         auto_install_aria2 $ARIA2_OS;;
                 n|*)    printf "\nExiting...\n";exit;;
@@ -161,8 +162,7 @@ auto_install_aria2(){
                         read InstallforI
                             case $InstallforI in
                                 n|N )
-                                        exit
-                                        ;;
+                                        exit;;
                                 y|Y|*)
                                         printf "installing Aria2\n"
                                         TMP=$(mktemp -d)
@@ -170,18 +170,39 @@ auto_install_aria2(){
                                         dpkg -i -R $TMP
                                         rm -r $TMP
                                         printf "\nDone\n"
-                                        exit
-                                        ;;
+                                        exit;;
                             esac
                     ;;
                 mac|"mac os")
-                    printf "\nYou Need to have Homebrew installed"
-                    printf "You can get it from \"http://brew.sh\""
-                    printf "Attempting..."
-                    sh /$RUNPATH/$MYSCRIPT -u
-                    exit
+                    printf "\nYou Need to have Homebrew installed\n"
+                    printf "\n 1) Homebrew is already installed, Install Aria2 Now \n 2) Install Homebrew, then Aria2\n Q) to Quit\n"
+                        read -n 1 STEP
+                            case $STEP in
+                                1)  printf "Installing..."
+                                    sh /$RUNPATH/$MYSCRIPT -u;exit;;
+                                2)  (/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)")&&(sh /$RUNPATH/$MYSCRIPT -u);exit;;
+                                q|*) exit;;
+                            esac
                     ;;
-                    *) printf "\nExiting...\n";exit;;
+                win64)
+                    TMP=$(mktemp -d)
+                    wget -e robots=off -r -nc -np -nd -nH --accept-regex=64bit -R 'latest' https://github.com/aria2/aria2/releases/latest -P $TMP && echo Downloaded
+                    unzip $TMP/aria2*
+                     mv $TMP/aria2*/aria2c.exe $RUNPATH
+                    rm -r $TMP;;
+                win32)
+                    TMP=$(mktemp -d)
+                    wget -e robots=off -r -nc -np -nd -nH --accept-regex=32bit -R 'latest' https://github.com/aria2/aria2/releases/latest -P $TMP && echo Downloaded
+                    unzip $TMP/aria2*
+                    mv $TMP/aria2*/aria2c.exe $RUNPATH
+                    rm -r $TMP;;
+                android)
+                    TMP=$(mktemp -d)
+                    wget -e robots=off -r -nc -np -nd -nH --accept-regex=android -R 'latest' https://github.com/aria2/aria2/releases/latest -P $TMP && echo Downloaded
+                    unzip $TMP/aria2*
+                    mv $TMP/aria2*/aria2c $RUNPATH
+                    rm -r $TMP;;
+                *)  printf "\nExiting...\n";exit;;
         esac
 
 }
@@ -210,26 +231,18 @@ set_alloc(){
     printf "for the default vaule Press Enter/Return\n"
     read get_value
         case $get_value in
-        none )
-                file_alloc=none
-                printf "\nYou Chose $file_alloc\n"
-                read -t 1 ok
-                ;;
-        trunc )
-                file_alloc=trunc
-                printf "\nYou Chose $file_alloc\n"
-                read -t 1 ok
-                ;;
-        falloc )
-                file_alloc=falloc
-                printf "\nYou Chose $file_alloc\n"
-                read -t 1 ok
-                ;;
-        prealloc|* )
-                file_alloc=prealloc
-                printf "\nYou Chose $file_alloc\n"
-                read -t 1 ok
-                ;;
+            trunc)
+                    file_alloc=trunc
+                    printf "\nYou Chose $file_alloc\n"
+                    sleep 1;;
+            falloc)
+                    file_alloc=falloc
+                    printf "\nYou Chose $file_alloc\n"
+                    sleep 1;;
+            prealloc|*)
+                    file_alloc=prealloc
+                    printf "\nYou Chose $file_alloc\n"
+                    sleep 1;;
         esac
 }
 
