@@ -10,13 +10,6 @@ use the Downloader.sh.
 
 detailed usage coming soon
 
-~~CLI only Coming Soon (Maybe)~~
-
-for now the Script Contains Everything
-Memory manager (linux only)
-Downloader  (all platforms)
-MiniDLNA manager (linux)
-
 
  ** To-Do **
  
@@ -43,5 +36,3 @@ MiniDLNA manager (linux)
   [✓]   11-Use a check system for artwork in downloader.
   
   [✓]   12-Create specific page for each platform.
-  
-  [✓]   13-Divide into Seperate Modules to run from CLI.
