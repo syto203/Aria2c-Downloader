@@ -126,7 +126,15 @@ if [[ -f $SET_ARIA2C ]] && [[ -x $SET_ARIA2C ]]             # Check if Binary Ex
         printf "Want to attempt to install it? (Y/N)\n"
         read -n 1 INSTALL_PROMPT
             case $INSTALL_PROMPT in
-                y)  auto_install_aria2 $ARIA2_OS;;
+                y)  if [[ $ARIA2_OS == "cust" ]]
+                        then
+                            printf "\nWhat is your OS\n Enter one of the following\n"
+                            printf "openwrt , ios , mac , win64 , win32 , android\n"
+                            read ARIA2_OS
+                        else
+                            echo $ARIA2_OS
+                    fi
+                auto_install_aria2 $ARIA2_OS;;
                 n|*)    printf "\nExiting...\n";exit;;
                 esac
 fi
