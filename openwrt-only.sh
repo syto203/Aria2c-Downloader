@@ -276,6 +276,58 @@ exit 10
 ;;
 esac                # End of OS Selector cases
 }
+download_script(){
+################### Start of Download Script ############################
+clear
+sleep 1
+case $ARIA2_OS in
+openwrt)    OPENWRT_LOGO;;
+ios)        IOS_LOGO;;
+mac)        MAC_OS_LOGO;;
+cust)       CUST_OS_LOGO;;
+esac
+echo
+echo "*************************"
+echo "* Aria2 Auto-Downloader *"
+echo "*************************"
+echo "Hi,"
+echo "Input Download Link."
+echo "----------------"
+read -p 'Link= ' URL
+echo " "
+echo "##################################################################"
+echo "You Entered"
+echo $URL
+echo "##################################################################"
+### Change output filename ###
+printf "Keep Original Filename (Y/N)?\n"
+read -n 1 FNAME
+echo " "
+download_http_final $FNAME
+
+echo "Initiating......"
+sleep 1
+echo "The Download is in the Background"
+echo "Press M to monitor or any key to Exit"
+read -n1 INPUT
+case $INPUT in
+m|M)
+clear;printf "Monitoring....\n"
+sleep 1
+tail -f $LOG
+;;
+*)
+printf "Exiting.....\n"
+printf "To Stop Downloading\nkillall aria2c\n"
+printf "To Monitor\ntail -f "$LOG"\n"
+sleep 1
+exit
+;;
+esac
+#########################################################
+############ End of Aria2c Downloader Script#############
+#########################################################
+}
 set_threads(){
     printf "\nSet Download Threads No.:  "
     read THREADS
@@ -292,26 +344,26 @@ return 1
 set_alloc(){
 printf "\nSet File Allocation Method  "
 printf "\nPossible Values: none, prealloc, trunc, falloc\n"
-printf "Default value= prealloc\n"
+printf "Default value= none\n"
 printf "for the default vaule Press Enter/Return\n"
 read get_value
 case $get_value in
 trunc)
 file_alloc=trunc
 printf "\nYou Chose $file_alloc\n"
-sleep 1;;
+read ok;;
 falloc)
 file_alloc=falloc
 printf "\nYou Chose $file_alloc\n"
-sleep 1;;
+read ok;;
 prealloc)
 file_alloc=prealloc
 printf "\nYou Chose $file_alloc\n"
-sleep 1;;
+read ok;;
 none|*)
 file_alloc=none
 printf "\nYou Chose $file_alloc\n"
-sleep 1;;
+read ok;;
 esac
 }                        # Choose Allocation method
 adv_para(){
@@ -358,7 +410,6 @@ case $1 in             # Start of OS Selector cases
         printf "Download Loation: "$DIR"\n"
         printf "Log Location: "$LOG"\n"
         echo "Continuing..."
-        DOWNLOADER_ARIA2
         ;;
     z|Z)                                                    # Custom Inputs
         clear
@@ -388,7 +439,6 @@ case $1 in             # Start of OS Selector cases
         printf "Download Loation: "$DIR"\n"
         printf "Log Location: "$LOG"\n"
         echo "Continuing..."
-        DOWNLOADER_ARIA2
         ;;      #custom install case
         *)
         printf "\nYou Didn't Choose. Exiting...\n"
@@ -431,56 +481,7 @@ printf "  Press \"O\" for OpenWRT/Linux\n "
 printf " Press \"z\" to use Custom Download locations (ADVANCED)\n"
 read -n 1 OS_Main
 os_select $OS_Main
-    ################### Start of Download Script ############################
-    clear
-    sleep 1
-    case $ARIA2_OS in
-        openwrt)    OPENWRT_LOGO;;
-        ios)        IOS_LOGO;;
-        mac)        MAC_OS_LOGO;;
-        cust)       CUST_OS_LOGO;;
-    esac
-    echo
-    echo "*************************"
-    echo "* Aria2 Auto-Downloader *"
-    echo "*************************"
-    echo "Hi,"
-    echo "Input Download Link."
-    echo "----------------"
-    read -p 'Link= ' URL
-    echo " "
-    echo "##################################################################"
-    echo "You Entered"
-    echo $URL
-    echo "##################################################################"
-    ### Change output filename ###
-    printf "Keep Original Filename (Y/N)?\n"
-    read -n 1 FNAME
-    echo " "
-    download_http_final $FNAME
-
-    echo "Initiating......"
-    sleep 1
-    echo "The Download is in the Background"
-    echo "Press M to monitor or any key to Exit"
-    read -n1 INPUT
-    case $INPUT in
-        m|M)
-            clear;printf "Monitoring....\n"
-            sleep 1
-            tail -f $LOG
-            ;;
-        *)
-            printf "Exiting.....\n"
-            printf "To Stop Downloading\nkillall aria2c\n"
-            printf "To Monitor\ntail -f "$LOG"\n"
-            sleep 1
-            exit
-            ;;
-    esac
-#########################################################
-############ End of Aria2c Downloader Script#############
-#########################################################
+download_script
 # End of DOWNLOADER_ARIA2
 }       # Main Downloader script with OS Selector
 ############################################################################
@@ -511,7 +512,8 @@ while getopts "auoidjwxrh" OPTS; do
             echo "(__)(__)(____/  \/(__)(__)(_)\_)\___)(____)(____/ ";
             ;;
         o)  auto_install_aria2 openwrt;;
-        d)  os_select o;;
+        d)  os_select o
+            download_script;;
         j)  adv_para;;
 #        b) DOWNLOADER_ARIA2_TORRENT;;
         *|h)  usage_adv
