@@ -82,23 +82,43 @@ case $1 in
         exit 0
         ;;
     n|N)
-        echo "Enter Filename: (Don't forget the Extension)"
+        printf "\nEnter The New Filename: (Don't forget the Extension)\n"
         read CUSTOM_FNAME
-        echo "The Following will now Run."
-        echo "--****------****----****------****----****------****----****------****----****------****--"
-        echo "aria2c "-d" "$DIR ""-o" "$CUSTOM_FNAME " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$ADV" "$URL "> "$LOG" 2>&1 &"
-        echo "--****------****----****------****----****------****----****------****----****------****--"
-        echo "Press Enter to Continue"
+        echo
+        printf "Go Ahead with the Following:\n"
+        echo "------------------------"
+        printf "URL: $URL\n"
+        printf "Download Location: $DIR\n"
+        printf "File Name: $CUSTOM_FNAME\n"
+        printf "File Allocation: $file_alloc\n"
+        printf "Max Threads: $THREADS\n"
+        printf "Max Connections: $MAX\n"
+        printf "Segment Size: $SEG\n"
+        printf "Log Location: $LOG\n"
+        echo "------------------------"
+        printf "Extra Arguments: $ADV\n"
+        echo "------------------------"
+        printf "Press Enter to Continue\n"
         read ok
         $SET_ARIA2C -d $DIR -o "$CUSTOM_FNAME" -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
         ;;
     y|Y|*)
-        printf "NOTICE!!!   Didn't change The File Name\n\n"
-        echo "The Following will now Run."
-        echo "--****------****----****------****----****------****----****------****----****------****--"
-        echo "aria2c "-d" "$DIR " -c "-s" "$THREADS" "--file-allocation=""$file_alloc" "-x" "$MAX" "-k" "$SEG" "$ADV" "$URL "> "$LOG" 2>&1 &"
-        echo "--****------****----****------****----****------****----****------****----****------****--"
-        echo "Press Enter to Continue"
+        printf "\nNOTICE!!!   You Didn't change The File Name\n\n"
+        echo "------------------------"
+        printf "Go Ahead with the Following:\n"
+        echo "------------------------"
+        printf "URL: $URL\n"
+        printf "Download Location: $DIR\n"
+        printf "File Name: $CUSTOM_FNAME\n"
+        printf "File Allocation: $file_alloc\n"
+        printf "Max Threads: $THREADS\n"
+        printf "Max Connections: $MAX\n"
+        printf "Segment Size: $SEG\n"
+        printf "Log Location: $LOG\n"
+        echo "------------------------"
+        printf "Extra Arguments: $ADV\n"
+        echo "------------------------"
+        printf "Press Enter to Continue\n"
         read ok
         $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
         ;;
@@ -278,55 +298,42 @@ esac                # End of OS Selector cases
 }
 download_script(){
 ################### Start of Download Script ############################
-clear
-sleep 1
-case $ARIA2_OS in
-openwrt)    OPENWRT_LOGO;;
-ios)        IOS_LOGO;;
-mac)        MAC_OS_LOGO;;
-cust)       CUST_OS_LOGO;;
-esac
-echo
-echo "*************************"
-echo "* Aria2 Auto-Downloader *"
-echo "*************************"
-echo "Hi,"
-echo "Input Download Link."
-echo "----------------"
-read -p 'Link= ' URL
-echo " "
-echo "##################################################################"
-echo "You Entered"
-echo $URL
-echo "##################################################################"
-### Change output filename ###
-printf "Keep Original Filename (Y/N)?\n"
-read -n 1 FNAME
-echo " "
-download_http_final $FNAME
+  clear
+  OPENWRT_LOGO
+  echo
+  echo "*************************"
+  echo "* Aria2 Auto-Downloader *"
+  echo "*************************"
+  echo "Hi,"
+  echo "Input Download Link."
+  echo "----------------"
+  read -p 'Link= ' URL
+  ### Change output filename ###
+  printf "\nKeep Original Filename (Y/N)?\n"
+  read -n 1 FNAME
+  echo " "
+  download_http_final $FNAME
 
-echo "Initiating......"
-sleep 1
-echo "The Download is in the Background"
-echo "Press M to monitor or any key to Exit"
-read -n1 INPUT
-case $INPUT in
-m|M)
-clear;printf "Monitoring....\n"
-sleep 1
-tail -f $LOG
-;;
-*)
-printf "Exiting.....\n"
-printf "To Stop Downloading\nkillall aria2c\n"
-printf "To Monitor\ntail -f "$LOG"\n"
-sleep 1
-exit
-;;
-esac
-#########################################################
+  printf "Initiating......\n"
+  printf "The Download is in Progress\n"
+  printf "\n  Note: if you chose \"Monitor\" you can't close this session\n"
+  printf "  If You Choose to Background, a command will be provided so you can check the progress\n"
+  echo "Press \"M\" to Monitor\nAny key to Background and Close\n"
+  read -n1 INPUT
+  case $INPUT in
+    m|M)
+    clear;printf "Monitoring....\n"
+    tail -f $LOG
+    ;;
+    *)
+    printf "\nBackgrounding.....\n"
+    printf "To Stop Downloading use\n killall aria2c\n"
+    printf "To Check Progress\n tail -f "$LOG"\n"
+    sleep 1
+    exit
+    ;;
+  esac
 ############ End of Aria2c Downloader Script#############
-#########################################################
 }
 set_threads(){
     printf "\nSet Download Threads No.:  "
