@@ -109,7 +109,6 @@ case $1 in
         echo "------------------------"
         printf "URL: $URL\n"
         printf "Download Location: $DIR\n"
-        printf "File Name: $CUSTOM_FNAME\n"
         printf "File Allocation: $file_alloc\n"
         printf "Max Threads: $THREADS\n"
         printf "Max Connections: $MAX\n"
@@ -280,6 +279,7 @@ printf " -w         Install Aria2 for 64-bit Windows\n"
 printf " -x         Install Aria2 for 64-bit Windows\n"
 printf " -r         Install Aria2 for Android\n"
 printf " -d         Jump to OS Selector\n"
+printf " -k         To Kill Aria2's process"
 printf " -j         for passing more Aria2 paramters (ex. -j 1)\n\n"
 }                        # Show usage info
 #countdown()             #usage: countdown "00:00:05" #
@@ -445,7 +445,6 @@ read -n 1 OS_Main
     esac                # End of OS Selector cases
     ################### Start of Download Script ############################
     clear
-    sleep 1
     case $ARIA2_OS in
         openwrt)    OPENWRT_LOGO;;
         ios)        IOS_LOGO;;
@@ -460,6 +459,11 @@ read -n 1 OS_Main
     echo "Input Download Link."
     echo "----------------"
     read -p 'Link= ' URL
+        if [[ -z $URL ]]            # check if url is empty
+        then
+        printf "You Didn't Enter a URL\n"
+        exit
+        fi
     ### Change output filename ###
     printf "\nKeep Original Filename (Y/N)?\n"
     read -n 1 FNAME
@@ -502,7 +506,7 @@ ADV="-j 1"                                        #
 clear
 ##########################################################################
 # parse CLI input
-while getopts "auoidjwxrh" OPTS; do
+while getopts "auoidjwxrkh" OPTS; do
     case $OPTS in
         a)
             set_threads
@@ -523,6 +527,7 @@ while getopts "auoidjwxrh" OPTS; do
         w) auto_install_aria2 win64;;
         x) auto_install_aria2 win32;;
         r) auto_install_aria2 android;;
+        k) killall aria2c;;
 #        b) DOWNLOADER_ARIA2_TORRENT;;
         *|h)  usage_adv
             exit 0;;

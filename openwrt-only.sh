@@ -87,16 +87,16 @@ case $1 in
         echo
         printf "Go Ahead with the Following:\n"
         echo "------------------------"
-        printf "URL: $URL\n"
-        printf "Download Location: $DIR\n"
-        printf "File Name: $CUSTOM_FNAME\n"
-        printf "File Allocation: $file_alloc\n"
-        printf "Max Threads: $THREADS\n"
-        printf "Max Connections: $MAX\n"
-        printf "Segment Size: $SEG\n"
-        printf "Log Location: $LOG\n"
+        printf "*URL: $URL\n"
+        printf "*Download Location: $DIR\n"
+        printf "*File Name: $CUSTOM_FNAME\n"
+        printf "*File Allocation: $file_alloc\n"
+        printf "*Max Threads: $THREADS\n"
+        printf "*Max Connections: $MAX\n"
+        printf "*Segment Size: $SEG\n"
+        printf "*Log Location: $LOG\n"
         echo "------------------------"
-        printf "Extra Arguments: $ADV\n"
+        printf "*Extra Arguments: $ADV\n"
         echo "------------------------"
         printf "Press Enter to Continue\n"
         read ok
@@ -107,16 +107,15 @@ case $1 in
         echo "------------------------"
         printf "Go Ahead with the Following:\n"
         echo "------------------------"
-        printf "URL: $URL\n"
-        printf "Download Location: $DIR\n"
-        printf "File Name: $CUSTOM_FNAME\n"
-        printf "File Allocation: $file_alloc\n"
-        printf "Max Threads: $THREADS\n"
-        printf "Max Connections: $MAX\n"
-        printf "Segment Size: $SEG\n"
-        printf "Log Location: $LOG\n"
+        printf "*URL: $URL\n"
+        printf "*Download Location: $DIR\n"
+        printf "*File Allocation: $file_alloc\n"
+        printf "*Max Threads: $THREADS\n"
+        printf "*Max Connections: $MAX\n"
+        printf "*Segment Size: $SEG\n"
+        printf "*Log Location: $LOG\n"
         echo "------------------------"
-        printf "Extra Arguments: $ADV\n"
+        printf "*Extra Arguments: $ADV\n"
         echo "------------------------"
         printf "Press Enter to Continue\n"
         read ok
@@ -308,6 +307,11 @@ download_script(){
   echo "Input Download Link."
   echo "----------------"
   read -p 'Link= ' URL
+    if [[ -z $URL ]]                   # check if url is empty
+        then
+            printf "You Didn't Enter a URL\n"
+            exit
+    fi
   ### Change output filename ###
   printf "\nKeep Original Filename (Y/N)?\n"
   read -n 1 FNAME
@@ -318,7 +322,7 @@ download_script(){
   printf "The Download is in Progress\n"
   printf "\n  Note: if you chose \"Monitor\" you can't close this session\n"
   printf "  If You Choose to Background, a command will be provided so you can check the progress\n"
-  echo "Press \"M\" to Monitor\nAny key to Background and Close\n"
+  printf "\nPress \"M\" to Monitor\nAny key to Background and Close\n"
   read -n1 INPUT
   case $INPUT in
     m|M)
@@ -387,6 +391,7 @@ printf " -h         Shows this Usage Info\n"
 printf " -o         Install Aria2 for OpenWRT\n"
 printf " -d         Jump to OS Selector\n"
 printf " -j         for passing more Aria2 paramters (ex. -j 1)\n\n"
+printf " -k         To Kill Aria2's process\n"
 }                        # Show usage info
 os_select(){
 case $1 in             # Start of OS Selector cases
@@ -505,7 +510,7 @@ ADV="-j 1"                                        #
 clear
 ##########################################################################
 # parse CLI input
-while getopts "auoidjwxrh" OPTS; do
+while getopts "aodjkh" OPTS; do
     case $OPTS in
         a)
             set_threads
@@ -522,6 +527,7 @@ while getopts "auoidjwxrh" OPTS; do
         d)  os_select o
             download_script;;
         j)  adv_para;;
+        k)  killall aria2c;;
 #        b) DOWNLOADER_ARIA2_TORRENT;;
         *|h)  usage_adv
             exit 0;;
