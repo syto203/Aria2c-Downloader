@@ -2,13 +2,13 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:/Users/syto203/Documents/XCode/Aria2c-Downloader/openwrt-only.sh">
+   </FileRef>
+   <FileRef
+      location = "group:/Users/syto203/Documents/XCode/Aria2c-Downloader/Downloader.sh">
+   </FileRef>
+   <FileRef
       location = "group:Aria2 Downloader/Aria2 Downloader.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:/Users/samahy/Documents/XCode/Aria2c-Downloader/Downloader.sh">
-   </FileRef>
-   <FileRef
-      location = "group:/Users/samahy/Documents/XCode/Aria2c-Downloader/openwrt-only.sh">
    </FileRef>
    <FileRef
       location = "group:README.md">

@@ -3,7 +3,7 @@
 # mainly for use on OpenWRT router as a "Background Downloader"
 # just don't tell anyone you are using it xD
 ###########################################################################
-# Dependancies
+# Dependancies:
 # assuming you have a functioning storage
 # visit https://aria2.github.io/
 # aria2c 1.34+
@@ -87,39 +87,45 @@ case $1 in
         echo
         printf "Go Ahead with the Following:\n"
         echo "------------------------"
-        printf "URL: $URL\n"
-        printf "Download Location: $DIR\n"
-        printf "File Name: $CUSTOM_FNAME\n"
-        printf "File Allocation: $file_alloc\n"
-        printf "Max Threads: $THREADS\n"
-        printf "Max Connections: $MAX\n"
-        printf "Segment Size: $SEG\n"
-        printf "Log Location: $LOG\n"
+        printf "*URL: $URL\n"
+        printf "*Download Location: $DIR\n"
+        printf "*File Name: $CUSTOM_FNAME\n"
+        printf "*File Allocation: $file_alloc\n"
+        printf "*Max Threads: $THREADS\n"
+        printf "*Max Connections: $MAX\n"
+        printf "*Segment Size: $SEG\n"
+        printf "*Log Location: $LOG\n"
         echo "------------------------"
-        printf "Extra Arguments: $ADV\n"
+        printf "*Extra Arguments: $ADV\n"
         echo "------------------------"
         printf "Press Enter to Continue\n"
         read ok
         $SET_ARIA2C -d $DIR -o "$CUSTOM_FNAME" -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
         ;;
     y|Y|*)
-        printf "\nNOTICE!!!   You Didn't change The File Name\n\n"
+        printf "\nNOTICE!!!   Didn't change The File Name\n\n"
+        sleep 1         # sleep to notice the notice xD.
         echo "------------------------"
         printf "Go Ahead with the Following:\n"
         echo "------------------------"
-        printf "URL: $URL\n"
-        printf "Download Location: $DIR\n"
-        printf "File Allocation: $file_alloc\n"
-        printf "Max Threads: $THREADS\n"
-        printf "Max Connections: $MAX\n"
-        printf "Segment Size: $SEG\n"
-        printf "Log Location: $LOG\n"
+        printf "*URL: $URL\n"
+        printf "*Download Location: $DIR\n"
+        printf "*File Allocation: $file_alloc\n"
+        printf "*Max Threads: $THREADS\n"
+        printf "*Max Connections: $MAX\n"
+        printf "*Segment Size: $SEG\n"
+        printf "*Log Location: $LOG\n"
         echo "------------------------"
-        printf "Extra Arguments: $ADV\n"
+        printf "*Extra Arguments: $ADV\n"
         echo "------------------------"
         printf "Press Enter to Continue\n"
         read ok
-        $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
+        if [[ $URLCHECK == "list" ]]                  # check if input is a list
+            then
+              $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" -i "$URL" > $LOG 2>&1 &
+            else
+              $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
+      fi
         ;;
 esac
 }              # Function to Change Output Name
@@ -170,12 +176,12 @@ auto_install_aria2(){
                     printf "To Get the Most Up-To-Date Features\n"
                     printf "However, I can try to manually install it\n"
                     printf "Proceed ?\n"
-                        read InstallforI
+                        read -p 'You Choose = ' -n 1 InstallforI
                             case $InstallforI in
                                 n|N )
                                         exit;;
                                 y|Y|*)
-                                        printf "installing Aria2\n"
+                                        printf "\nInstalling Aria2\n"
                                         TMP=$(mktemp -d)
                                         wget -e robots=off -r -nc -np -nd -nH --accept-regex=aria2 -R 'index.html' https://apt.bingner.com/debs/1443.00/ -P $TMP && echo Downloaded
                                         dpkg -i -R $TMP
@@ -186,10 +192,10 @@ auto_install_aria2(){
                     ;;
                 mac)
                     printf "\nYou Need to have Homebrew installed\n"
-                    printf "\n 1) Homebrew is already installed, Install Aria2 Now \n 2) Install Homebrew, then Aria2\n Q) to Quit\n"
-                        read -n 1 STEP
+                    printf "\n 1) Homebrew is already installed, Install Aria2 Now. \n 2) Install Homebrew, then Aria2.\n Q) Quit\n"
+                        read -p 'You Choose = ' -n 1 STEP
                             case $STEP in
-                                1)  printf "Installing..."
+                                1)  printf "\nInstalling..."
                                     printf "\ninstalling for Mac via homebrew\n"
                                     brew install aria2 && clear;exit;;
                                 2)  (/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)")&&(sh /$RUNPATH/$MYSCRIPT -u);exit;;
@@ -282,42 +288,7 @@ printf " -d         Jump to OS Selector\n"
 printf " -k         To Kill Aria2's process"
 printf " -j         for passing more Aria2 paramters (ex. -j 1)\n\n"
 }                        # Show usage info
-#countdown()             #usage: countdown "00:00:05" #
-#(
-#IFS=:
-#set -- $*
-#secs=$(( ${1#0} * 3600 + ${2#0} * 60 + ${3#0} ))
-#while [ $secs -gt 0 ]
-#    do
-#    sleep 1 &
-#    printf "\r%02d:%02d:%02d" $((secs/3600)) $(( (secs/60)%60)) $((secs%60))
-#    secs=$(( $secs - 1 ))
-#    wait
-#    done
-#echo    #empty line
-#echo message    # any command
-#)
-############################################################################
-DOWNLOADER_ARIA2(){
-clear
-echo "Opening Downloader"
-clear
-echo "    ____                      __                __         ";
-echo "   / __ \____ _      ______  / /___  ____ _____/ /__  _____";
-echo "  / / / / __ \ | /| / / __ \/ / __ \/ __ \`/ __  / _ \/ ___/";
-echo " / /_/ / /_/ / |/ |/ / / / / / /_/ / /_/ / /_/ /  __/ /    ";
-echo "/_____/\____/|__/|__/_/ /_/_/\____/\__,_/\__,_/\___/_/     ";
-echo "                                                           ";
-#######################################################################################################
-################################### OS Selector #######################################
-#######################################################################################################
-printf "Choose your OS\n"
-echo
-printf "  Press \"O\" for OpenWRT/Linux\n "
-printf " Press \"i\" for iOS\n "
-printf " Press \"m\" for Mac OS\n "
-printf " Press \"z\" to use Custom Download locations (ADVANCED)\n"
-read -n 1 OS_Main
+os_select(){
     case $OS_Main in             # Start of OS Selector cases
 
         o|O)            # OpenWRT
@@ -443,7 +414,10 @@ read -n 1 OS_Main
             exit 10
             ;;
     esac                # End of OS Selector cases
-    ################### Start of Download Script ############################
+
+}                     # sets the working directories required for the downloader.
+download_script(){
+  ################### Start of Download Script ############################
     clear
     case $ARIA2_OS in
         openwrt)    OPENWRT_LOGO;;
@@ -456,40 +430,97 @@ read -n 1 OS_Main
     echo "* Aria2 Auto-Downloader *"
     echo "*************************"
     echo "Hi,"
-    echo "Input Download Link."
+    echo "Input a Download Link or type \"list\" for Download List location."
     echo "----------------"
-    read -p 'Link= ' URL
-        if [[ -z $URL ]]            # check if url is empty
-        then
-        printf "You Didn't Enter a URL\n"
-        exit
-        fi
+    read -p 'Link= ' URLCHECK
+      if [[ -z $URLCHECK ]]                                         # check if url is empty
+          then
+              printf "Input is Empty\n"
+              exit
+      fi
+  if [[ $URLCHECK == "list" ]]            # check if input is a list
+      then
+          printf "\nEnter a List Location/URL\n"
+          read -p 'List = ' URL
+                  if [[ -z $URL ]]                                         # check if url is empty
+                      then
+                          printf "Input is Empty\n"
+                          printf "Try Again\n"
+                          exit
+                  fi
+  fi
+
     ### Change output filename ###
-    printf "\nKeep Original Filename (Y/N)?\n"
-    read -n 1 FNAME
-    echo " "
-    download_http_final $FNAME
+    # set -x
+    if [[ $URLCHECK != "list" ]]          # check if input is a list
+        then
+            printf "\nKeep Original Filename (Y/N)?\n"
+            read -n 1 FNAME
+            echo " "
+            download_http_final $FNAME
+        else
+          download_http_final y
+    fi
 
     printf "Initiating......\n"
     printf "The Download is in Progress\n"
     printf "\n  Note: if you chose \"Monitor\" you can't close this session\n"
     printf "  If You Choose to Background, a command will be provided so you can check the progress\n"
-    echo "Press \"M\" to Monitor\nAny key to Background and Close\n"
+    printf "\nPress \"M\" to Monitor\nAny key to Background and Close\n"
     read -n1 INPUT
     case $INPUT in
-        m|M)
-            clear;printf "Monitoring....\n"
-            tail -f $LOG
-            ;;
-        *)
-            printf "\nBackgrounding.....\n"
-            printf "To Stop Downloading use\n killall aria2c\n"
-            printf "To Check Progress\n tail -f "$LOG"\n"
-            sleep 1
-            exit
-            ;;
+      m|M)
+      clear;printf "Monitoring....\n"
+      tail -f $LOG
+      ;;
+      *)
+      printf "\nBackgrounding.....\n"
+      printf "To Stop Downloading use\n killall aria2c\n"
+      printf "To Check Progress\n tail -f "$LOG"\n"
+      sleep 1
+      exit
+      ;;
     esac
-############ End of Aria2c Downloader Script#############
+  ############ End of Aria2c Downloader Script#############
+}     # set url or list as input
+#countdown()             #usage: countdown "00:00:05" #
+#(
+#IFS=:
+#set -- $*
+#secs=$(( ${1#0} * 3600 + ${2#0} * 60 + ${3#0} ))
+#while [ $secs -gt 0 ]
+#    do
+#    sleep 1 &
+#    printf "\r%02d:%02d:%02d" $((secs/3600)) $(( (secs/60)%60)) $((secs%60))
+#    secs=$(( $secs - 1 ))
+#    wait
+#    done
+#echo    #empty line
+#echo message    # any command
+#)
+############################################################################
+DOWNLOADER_ARIA2(){
+clear
+echo "Opening Downloader"
+clear
+echo "    ____                      __                __         ";
+echo "   / __ \____ _      ______  / /___  ____ _____/ /__  _____";
+echo "  / / / / __ \ | /| / / __ \/ / __ \/ __ \`/ __  / _ \/ ___/";
+echo " / /_/ / /_/ / |/ |/ / / / / / /_/ / /_/ / /_/ /  __/ /    ";
+echo "/_____/\____/|__/|__/_/ /_/_/\____/\__,_/\__,_/\___/_/     ";
+echo "                                                           ";
+#######################################################################################################
+################################### OS Selector #######################################
+#######################################################################################################
+printf "Choose your OS\n"
+echo
+printf "  Press \"O\" for OpenWRT/Linux\n "
+printf " Press \"i\" for iOS\n "
+printf " Press \"m\" for Mac OS\n "
+printf " Press \"z\" to use Custom Download locations (ADVANCED)\n"
+read -n 1 OS_Main
+os_select $OS_Main
+download_script
 # End of DOWNLOADER_ARIA2
 }       # Main Downloader script with OS Selector
 ############################################################################

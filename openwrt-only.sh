@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/ash
 # Created by syto203
 # mainly for use on OpenWRT router as a "Background Downloader"
 # just don't tell anyone you are using it xD
@@ -103,7 +103,8 @@ case $1 in
         $SET_ARIA2C -d $DIR -o "$CUSTOM_FNAME" -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
         ;;
     y|Y|*)
-        printf "\nNOTICE!!!   You Didn't change The File Name\n\n"
+        printf "\nNOTICE!!! \n\n   Didn't change The File Name\n\n"
+        sleep 1         # sleep to notice the notice xD.
         echo "------------------------"
         printf "Go Ahead with the Following:\n"
         echo "------------------------"
@@ -119,7 +120,12 @@ case $1 in
         echo "------------------------"
         printf "Press Enter to Continue\n"
         read ok
-        $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
+        if [[ $URLCHECK == "list" ]]                  # check if input is a list
+            then
+              $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" -i "$URL" > $LOG 2>&1 &
+            else
+              $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
+      fi
         ;;
 esac
 }              # Function to Change Output Name
@@ -228,73 +234,6 @@ case $1 in
 esac
 
 }               # Aria2 Installer
-os_select(){
-case $1 in             # Start of OS Selector cases
-
-o|O)            # OpenWRT
-ARIA2_OS=openwrt
-clear
-OPENWRT_LOGO(){
-echo "   ____               __          _______ _______ ";
-echo "  / __ \              \ \        / /  __ \__   __|";
-echo " | |  | |_ __   ___ _ _\ \  /\  / /| |__) | | |   ";
-echo " | |  | | '_ \ / _ \ '_ \ \/  \/ / |  _  /  | |   ";
-echo " | |__| | |_) |  __/ | | \  /\  /  | | \ \  | |   ";
-echo "  \____/| .__/ \___|_| |_|\/  \/   |_|  \_\ |_|   ";
-echo "        | |                                       ";
-echo "        |_|                                       ";
-}
-OPENWRT_LOGO
-SET_ARIA2C=/usr/bin/aria2c                        # Default for OpenWRT and iOS
-local_aria2c        # use aria2c from local folder if found
-aria2c_check $SET_ARIA2C
-echo "Setting Work Directories"
-echo "Setting Download Directory"
-DIR=/mnt/sda1/usb/video
-set_download_location
-validate_download_directory $DIR
-printf "Setting Log Directory\n"
-set_log_location
-printf "Download Loation: "$DIR"\n"
-printf "Log Location: "$LOG"\n"
-echo "Continuing..."
-;;
-z|Z)                                                    # Custom Inputs
-clear
-ARIA2_OS=cust
-CUST_OS_LOGO(){
-echo "_________                 __                      ";
-echo "\_   ___ \ __ __  _______/  |_  ____   _____      ";
-echo "/    \  \/|  |  \/  ___/\   __\/  _ \ /     \     ";
-echo "\     \___|  |  /\___ \  |  | (  <_> )  Y Y  \    ";
-echo " \______  /____//____  > |__|  \____/|__|_|  /    ";
-echo "        \/           \/                    \/     ";
-echo "       .___                 __         .__  .__   ";
-echo "       |   | ____   _______/  |______  |  | |  |  ";
-echo "       |   |/    \ /  ___/\   __\__  \ |  | |  |  ";
-echo "       |   |   |  \\___ \  |  |  / __ \|  |_|  |__";
-echo "       |___|___|  /____  > |__| (____  /____/____/";
-echo "                \/     \/            \/           ";
-}
-CUST_OS_LOGO
-read -p "Aria2c's Binary Location (Skip if locally):   " SET_ARIA2C
-local_aria2c        # use aria2c from local folder if found
-aria2c_check $SET_ARIA2C
-read -p 'Enter Download Path:   ' DIR                # custome directory and check
-validate_download_directory $DIR
-printf "Setting Log Directory\n"
-set_log_location
-printf "Download Loation: "$DIR"\n"
-printf "Log Location: "$LOG"\n"
-echo "Continuing..."
-sleep 1
-;;      #custom install case
-*)
-printf "\nYou Didn't Choose. Exiting...\n"
-exit 10
-;;
-esac                # End of OS Selector cases
-}
 download_script(){
 ################### Start of Download Script ############################
   clear
@@ -304,19 +243,37 @@ download_script(){
   echo "* Aria2 Auto-Downloader *"
   echo "*************************"
   echo "Hi,"
-  echo "Input Download Link."
+  echo "Input a Download Link or type \"list\" for Download List location."
   echo "----------------"
-  read -p 'Link= ' URL
-    if [[ -z $URL ]]                   # check if url is empty
+  read -p 'Link= ' URLCHECK
+    if [[ -z $URLCHECK ]]                                         # check if url is empty
         then
-            printf "You Didn't Enter a URL\n"
+            printf "Input is Empty\n"
             exit
     fi
+if [[ $URLCHECK == "list" ]]            # check if input is a list
+    then
+        printf "\nEnter a List Location/URL\n"
+        read -p 'List = ' URL
+                if [[ -z $URL ]]                                         # check if url is empty
+                    then
+                        printf "Input is Empty\n"
+                        printf "Try Again\n"
+                        exit
+                fi
+fi
+
   ### Change output filename ###
-  printf "\nKeep Original Filename (Y/N)?\n"
-  read -n 1 FNAME
-  echo " "
-  download_http_final $FNAME
+  # set -x
+  if [[ $URLCHECK != "list" ]]          # check if input is a list
+      then
+          printf "\nKeep Original Filename (Y/N)?\n"
+          read -n 1 FNAME
+          echo " "
+          download_http_final $FNAME
+      else
+        download_http_final y
+  fi
 
   printf "Initiating......\n"
   printf "The Download is in Progress\n"
@@ -338,7 +295,7 @@ download_script(){
     ;;
   esac
 ############ End of Aria2c Downloader Script#############
-}
+}     # set url or list as input
 set_threads(){
     printf "\nSet Download Threads No.:  "
     read THREADS
@@ -457,7 +414,7 @@ case $1 in             # Start of OS Selector cases
         exit 10
         ;;
     esac                # End of OS Selector cases
-}
+}           # sets the working directories required for the downloader.
 #countdown()             #usage: countdown "00:00:05" #
 #(
 #IFS=:
@@ -541,7 +498,7 @@ echo " /  ___<   |  |\   __\/  _ \ /  ____/  /_\  \  _(__  < /  ___/";
 echo " \___ \ \___  | |  | (  <_> )       \  \_/   \/       \\___ \ ";
 echo "/____  >/ ____| |__|  \____/\_______ \_____  /______  /____  >";
 echo "     \/ \/                          \/     \/       \/     \/ ";
-sleep 1
+
 echo "      ________                      .__                    .___            ";
 echo "      \______ \   ______  _  ______ |  |   _________     __| _/___________ ";
 echo "       |    |  \ /  _ \ \/ \/ /    \|  |  /  _ \__  \   / __ |/ __ \_  __ \ ";
