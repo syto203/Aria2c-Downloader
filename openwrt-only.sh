@@ -261,6 +261,8 @@ if [[ $URLCHECK == "list" ]]            # check if input is a list
                         printf "Try Again\n"
                         exit
                 fi
+    else
+        URL=$URLCHECK
 fi
 
   ### Change output filename ###

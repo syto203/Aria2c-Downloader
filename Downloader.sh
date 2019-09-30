@@ -448,6 +448,8 @@ download_script(){
                           printf "Try Again\n"
                           exit
                   fi
+        else
+          URL=$URLCHECK
   fi
 
     ### Change output filename ###
