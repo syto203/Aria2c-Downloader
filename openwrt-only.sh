@@ -51,7 +51,7 @@ read -n 1 D_PATH
     case $D_PATH in
     1)  DIR=$RUNPATH
         printf " \nThe Download Path is set to your current Directory\n";;
-    3)  printf " \nDon't Use \"~\" in your Path\n"
+    3)  printf " \nDon't Use \"~\" in your Path or Place a trailing \"/\"\n"
         read -p 'Enter Download Path:   ' DIR;;
     2|*)  printf " \nThe Downloader's Path is \"$DIR\"\n";;
 esac
@@ -120,9 +120,12 @@ case $1 in
         echo "------------------------"
         printf "Press Enter to Continue\n"
         read ok
-        if [[ $URLCHECK == "list" ]]                  # check if input is a list
+        if [[ $URLCHECK == "list" ]] || [[ $URLCHECK == "l" ]]                  # check if input is a list
             then
               $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" -i "$URL" > $LOG 2>&1 &
+            elif [[ $URLCHECK == "torrent" ]] || [[ $URLCHECK == "t" ]]
+              then
+                $SET_ARIA2C -d $DIR -c true -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" -T "$URL" --listen-port=65500 --dht-listen-port=65400 -u 25 > $LOG 2>&1 &
             else
               $SET_ARIA2C -d $DIR -c -s $THREADS --file-allocation=$file_alloc -x $MAX -k $SEG "$ADV" "$URL" > $LOG 2>&1 &
       fi
@@ -243,7 +246,7 @@ download_script(){
   echo "* Aria2 Auto-Downloader *"
   echo "*************************"
   echo "Hi,"
-  echo "Input a Download Link or type \"list\" for Download List location."
+  echo "Input a Download Link, type \"list\" for Download List location. or \"torrent\" for a \".torrent\" file location"
   echo "----------------"
   read -p 'Link= ' URLCHECK
     if [[ -z $URLCHECK ]]                                         # check if url is empty
@@ -251,7 +254,7 @@ download_script(){
             printf "Input is Empty\n"
             exit
     fi
-if [[ $URLCHECK == "list" ]]            # check if input is a list
+if [[ $URLCHECK == "list" ]] || [[ $URLCHECK == "l" ]]            # check if input is a list
     then
         printf "\nEnter a List Location/URL\n"
         read -p 'List = ' URL
@@ -261,18 +264,35 @@ if [[ $URLCHECK == "list" ]]            # check if input is a list
                         printf "Try Again\n"
                         exit
                 fi
+elif [[ $URLCHECK == "torrent" ]] || [[ $URLCHECK == "t" ]]; then
+  printf "\nEnter a A Torrent's Location/URL\n"
+  read -p 'Torrent = ' URL
+          if [[ -z $URL ]]                                         # check if url is empty
+              then
+                  printf "Input is Empty\n"
+                  printf "Try Again\n"
+                  exit
+          fi
+  #statements
     else
         URL=$URLCHECK
 fi
 
   ### Change output filename ###
   # set -x
-  if [[ $URLCHECK != "list" ]]          # check if input is a list
+  if [[ $URLCHECK == "list" ]] || [[ $URLCHECK == "l" ]]          # check if input is a list
       then
           printf "\nKeep Original Filename (Y/N)?\n"
           read -n 1 FNAME
           echo " "
           download_http_final $FNAME
+  elif [[ $URLCHECK == "torrent" ]] || [[ $URLCHECK == "t" ]]          # check if input is a torrent
+        then
+            printf "\nKeep Original Filename (Y/N)?\n"
+            read -n 1 FNAME
+            echo " "
+            download_http_final $FNAME
+    #statements
       else
         download_http_final y
   fi
@@ -486,10 +506,12 @@ while getopts "aodjkh" OPTS; do
         d)  os_select o
             download_script;;
         j)  adv_para;;
-        k)  killall aria2c;;
+        k)  printf "\nAttempting to Kill Aria2c\n"
+            killall aria2c && printf "\nAria2c Killed\n"
+            exit;;
 #        b) DOWNLOADER_ARIA2_TORRENT;;
         *|h)  usage_adv
-            exit 0;;
+            exit 1;;
     esac
 done
 shift $(($OPTIND - 1))              # End of CLI Parser
