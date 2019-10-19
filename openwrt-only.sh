@@ -246,7 +246,7 @@ download_script(){
   echo "* Aria2 Auto-Downloader *"
   echo "*************************"
   echo "Hi,"
-  echo "Input a Download Link, type \"list\" for Download List location. or \"torrent\" for a \".torrent\" file location"
+  echo "Input a Download Link or type \"list\" for Download List location."
   echo "----------------"
   read -p 'Link= ' URLCHECK
     if [[ -z $URLCHECK ]]                                         # check if url is empty
@@ -282,10 +282,7 @@ fi
   # set -x
   if [[ $URLCHECK == "list" ]] || [[ $URLCHECK == "l" ]]          # check if input is a list
       then
-          printf "\nKeep Original Filename (Y/N)?\n"
-          read -n 1 FNAME
-          echo " "
-          download_http_final $FNAME
+          download_http_final y
   elif [[ $URLCHECK == "torrent" ]] || [[ $URLCHECK == "t" ]]          # check if input is a torrent
         then
             printf "\nKeep Original Filename (Y/N)?\n"
@@ -294,7 +291,10 @@ fi
             download_http_final $FNAME
     #statements
       else
-        download_http_final y
+        printf "\nKeep Original Filename (Y/N)?\n"
+        read -n 1 FNAME
+        echo " "
+        download_http_final $FNAME
   fi
 
   printf "Initiating......\n"
@@ -393,7 +393,7 @@ case $1 in             # Start of OS Selector cases
         aria2c_check $SET_ARIA2C
         echo "Setting Work Directories"
         echo "Setting Download Directory"
-        DIR=/mnt/sda1/usb/video
+        DIR=/mnt2/sda1/usb/video
         set_download_location
         validate_download_directory $DIR
         printf "Setting Log Directory\n"

@@ -469,18 +469,18 @@ fi
   # set -x
   if [[ $URLCHECK == "list" ]] || [[ $URLCHECK == "l" ]]          # check if input is a list
       then
-          printf "\nKeep Original Filename (Y/N)?\n"
-          read -n 1 FNAME
-          echo " "
-          download_http_final $FNAME
+        download_http_final y
   elif [[ $URLCHECK == "torrent" ]] || [[ $URLCHECK == "t" ]]          # check if input is a torrent
         then
             printf "\nKeep Original Filename (Y/N)?\n"
             read -n 1 FNAME
             echo " "
             download_http_final $FNAME
-      else
-        download_http_final y
+      else                                                              # input is single URL
+        printf "\nKeep Original Filename (Y/N)?\n"
+        read -n 1 FNAME
+        echo " "
+        download_http_final $FNAME
   fi
 
     printf "Initiating......\n"
